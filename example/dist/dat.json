@@ -1,0 +1,6 @@
+{
+  "title": "GraphQL Things Example",
+  "experimental": {
+    "apis": ["datPeers"]
+  }
+}

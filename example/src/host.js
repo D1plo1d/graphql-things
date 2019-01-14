@@ -14,7 +14,8 @@ const {
 
 // instantiate the dat node
 // const DAT_URL = 'dat://graphql-things-example.tegh.io'
-const DAT_URL = 'dat://db7d4d96c9d9e54c1be6f93dd40ae1acf0796232a10b846e21d9606489eccc0a/'
+// const DAT_URL = 'dat://db7d4d96c9d9e54c1be6f93dd40ae1acf0796232a10b846e21d9606489eccc0a/'
+const DAT_URL = 'dat://c53b89f627481422ad71a646c547105de1509b4b4552bb18c71e4be200b7ef4c/'
 const dat = Dat.createNode({
   path: './.dat-data',
 })

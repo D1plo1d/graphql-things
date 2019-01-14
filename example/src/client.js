@@ -15,23 +15,20 @@ const {
   clientKeys: identityKeys,
 } = keys
 
-const link = ThingLink({
-  identityKeys,
-  peerIdentityPublicKey: hostKeys.publicKey,
-  options: { reconnect: true },
-})
-
-console.log(link)
-
 const client = new ApolloClient({
-  link,
+  link: ThingLink({
+    identityKeys,
+    peerIdentityPublicKey: hostKeys.publicKey,
+    options: { reconnect: false },
+  }),
   cache: new InMemoryCache(),
 })
 
+// console.log('hello stuff')
 const App = () => (
   <ApolloProvider client={client}>
     <div>
-      <h2>My first Apollo app</h2>
+      <h2>GraphQL Things Example</h2>
     </div>
   </ApolloProvider>
 )

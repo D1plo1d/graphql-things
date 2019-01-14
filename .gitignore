@@ -46,6 +46,7 @@ buck-out/
 
 
 /dist
-/example/dist
+/example/dist/*
+!/example/dist/dat.json
 /example/keys
 /example/.dat-data

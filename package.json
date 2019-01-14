@@ -9,10 +9,9 @@
   "private": false,
   "scripts": {
     "bootstrap": "yarn && yarn build && yarn build-example && yarn create-example-keys",
-    "build-example": "babel ./example/src --presets=@babel/preset-env,@babel/preset-react --out-dir ./example/dist",
+    "build-example": "cd ./example && npx webpack --mode=development",
     "create-example-keys": "babel-node ./scripts/createKeys.js",
     "build-docs": "mmdc -i ./docs/connection-comparison.mmd -o ./docs/dist/connection-comparison.svg -t neutral -b transparent",
-    "build-example": "cd ./example && npx webpack --mode=development",
     "build": "babel src --out-dir dist && yarn build-example",
     "watch": "babel src --out-dir dist --watch",
     "example": "cd ./example/ && yarn start"
@@ -45,9 +44,13 @@
     "eslint-plugin-monorepo": "^0.2.0",
     "eslint-plugin-react": "^7.11.0",
     "fast-async": "^6.3.8",
-    "graphql": "^14.0.2",
     "mermaid": "^8.0.0",
     "mermaid.cli": "^0.5.1",
+    "graphql": "^14.0.2",
+    "subscriptions-transport-ws": "^0.9.15"
+  },
+  "peerDependencies": {
+    "graphql": "^14.0.2",
     "subscriptions-transport-ws": "^0.9.15"
   },
   "dependencies": {

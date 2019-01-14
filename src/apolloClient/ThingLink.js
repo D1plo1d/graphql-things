@@ -35,6 +35,21 @@ const ThingLink = ({
     webSocketImpl: socketImpl,
   })
 
+  /*
+   * Override the default 1 second connection timeout with something
+   * more appropriate for the time it takes to connect over Dat + WebRTC
+   *
+   * TODO: make this a user-configurable option
+   */
+  const sub = thingLink.subscriptionClient
+  clearTimeout(sub.maxConnectTimeoutId)
+  sub.maxConnectTimeoutId = setTimeout(() => {
+    if (sub.status !== sub.wsImpl.OPEN) {
+      sub.reconnecting = true
+      sub.close(false, true)
+    }
+  }, 10000)
+
   return thingLink
 }
 
