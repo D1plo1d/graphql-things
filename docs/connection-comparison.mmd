@@ -1,0 +1,13 @@
+graph TB
+  subgraph Other IOT Protocols
+    server[Centralized Cloud Servers]
+    otherUser[User]
+    otherThing[IOT Device]
+    otherThing --> server
+    otherUser --> server
+  end
+  subgraph GraphQL Things
+    graphqlThing[IOT device]
+    graphqlUser[User]
+    graphqlUser --> graphqlThing
+  end
