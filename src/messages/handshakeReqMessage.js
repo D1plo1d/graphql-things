@@ -4,7 +4,6 @@ import {
   HANDSHAKE_REQ,
   MESSAGE_PROTOCOL_VERSION,
   HANDSHAKE_ALGORITHM,
-  PUBLIC_KEY_LENGTH,
 } from '../constants'
 
 export const validateHandshakeReq = (handshakeReq) => {

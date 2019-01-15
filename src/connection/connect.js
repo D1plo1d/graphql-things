@@ -13,12 +13,13 @@ const connect = ({
       if (shouldAbortConnection()) {
         nextConnection.close()
         // if the socket has been closed then stop the connection process
-        return null
+        throw new Error('aborting the connection')
       }
 
       return nextConnection
     })
   )
+
   return connectionPath.reduce(connectionReducer, Promise.resolve(null))
 }
 

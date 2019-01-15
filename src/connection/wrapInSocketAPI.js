@@ -26,8 +26,8 @@ const wrapInSocketAPI = (params) => {
       connection.send(data)
     },
     close: () => {
-      // eslint-disable-next-line no-console
-      console.log('close socket')
+      console.log(new Error('close'))
+      throw new Error('close')
       if (connection != null) {
         connection.close()
       } else {
@@ -37,6 +37,7 @@ const wrapInSocketAPI = (params) => {
   })
 
   const onError = (error) => {
+    console.log('socket error')
     socket.readyState = SOCKET_STATES.CLOSED
 
     if (socket.onerror == null && socket.listenerCount('error' === 0)) {

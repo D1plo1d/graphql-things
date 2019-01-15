@@ -7,7 +7,7 @@ export const createECDHKey = async () => {
   const privateKey = await randomBytes(32)
   const publicKey = eccrypto.getPublic(privateKey).toString('hex')
   return {
-    privateKey,
+    privateKey: privateKey.toString('hex'),
     publicKey,
   }
 }
@@ -39,6 +39,13 @@ const kdf = (km) => {
   )
 }
 
+const derive = (privateKey, peerPublicKey) => (
+  eccrypto.derive(
+    Buffer.from(privateKey, 'hex'),
+    Buffer.from(peerPublicKey, 'hex'),
+  )
+)
+
 export const createSessionKey = async ({
   isHandshakeInitiator,
   identityKeys,
@@ -53,14 +60,11 @@ export const createSessionKey = async ({
     throw new Error('peerEphemeralPublicKey must be a string')
   }
 
-  const binaryPeerIdentityPublicKey = Buffer.from(peerIdentityPublicKey, 'hex')
-  const binaryPeerEphemeralPublicKey = Buffer.from(peerEphemeralPublicKey, 'hex')
-
   // Triple Diffie Helman
   const dhs = await Promise.all([
-    eccrypto.derive(identityKeys.privateKey, binaryPeerEphemeralPublicKey),
-    eccrypto.derive(ephemeralKeys.privateKey, binaryPeerIdentityPublicKey),
-    eccrypto.derive(ephemeralKeys.privateKey, binaryPeerEphemeralPublicKey),
+    derive(identityKeys.privateKey, peerEphemeralPublicKey),
+    derive(ephemeralKeys.privateKey, peerIdentityPublicKey),
+    derive(ephemeralKeys.privateKey, peerEphemeralPublicKey),
   ])
 
   const consitentlyOrderedDHs = (() => {

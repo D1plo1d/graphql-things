@@ -16,15 +16,7 @@ const receiverHandshake = async ({
   validateHandshakeReq(request)
 
   const ephemeralKeys = await createECDHKey()
-
-  console.log({
-    isHandshakeInitiator: false,
-    identityKeys,
-    ephemeralKeys,
-    peerIdentityPublicKey,
-    peerEphemeralPublicKey: request.ephemeralPublicKey,
-
-  })
+  console.log(2, { currentConnection })
   const sessionKey = await createSessionKey({
     isHandshakeInitiator: false,
     identityKeys,

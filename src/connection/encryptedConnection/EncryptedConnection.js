@@ -37,6 +37,7 @@ const EncryptedConnection = ({
   const peerIdentityPublicKey = await getKeys(peerIdentityPublicKeyParam)
 
   const handshake = initiator ? initiatorHandshake : receiverHandshake
+  console.log(1, { currentConnection })
 
   const {
     sessionKey,

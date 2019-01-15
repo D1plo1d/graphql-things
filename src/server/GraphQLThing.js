@@ -12,6 +12,7 @@ const GraphqlThing = ({
   identityKeys,
   // authenticate({ peerIdentityPublicKey }) => boolean
   authenticate,
+  wrtc,
 }) => {
   if (typeof authenticate !== 'function') {
     throw new Error('an authenticate callback is required')
@@ -55,6 +56,7 @@ const GraphqlThing = ({
       datPeer,
       datPeerNetwork,
       request: message,
+      wrtc,
     })
 
     const createSocket = wrapInSocketAPI({

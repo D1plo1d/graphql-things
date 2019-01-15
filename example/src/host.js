@@ -1,4 +1,5 @@
 import Dat from '@beaker/dat-node'
+import wrtc from 'wrtc'
 
 import { execute, subscribe } from 'graphql'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
@@ -47,6 +48,7 @@ const thing = GraphQLThing({
   datPeers,
   identityKeys,
   authenticate,
+  wrtc,
 })
 
 const options = {

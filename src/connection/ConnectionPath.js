@@ -23,6 +23,7 @@ const ConnectionPath = ({
   datPeerID,
   datPeerNetwork,
   request,
+  wrtc,
 }) => {
   // let initialConnection
 
@@ -63,6 +64,7 @@ const ConnectionPath = ({
     // Exchange SDPs over the secure connection and switch to WebRTC
     UpgradeToWebRTC({
       initiator,
+      wrtc,
     }),
   ]
   return connectionPath
