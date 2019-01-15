@@ -8,7 +8,7 @@ const Connection = ({
   send,
   close,
 }) => {
-  const connection = EventEmitter()
+  const connection = new EventEmitter()
 
   Object.assign(connection, {
     sessionID,

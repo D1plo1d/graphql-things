@@ -90,9 +90,9 @@ const wrapInSocketAPI = (params) => {
    */
   const socketImpl = (url, protocol) => {
     (async () => {
-      try {
+      // try {
         const {
-          sessionID = await randomBytes(32),
+          sessionID = (await randomBytes(32)).toString('hex'),
           connectionPath,
         } = params
 
@@ -105,9 +105,9 @@ const wrapInSocketAPI = (params) => {
           shouldAbortConnection,
         })
         onConnection(nextConnection)
-      } catch (e) {
-        onError(e)
-      }
+      // } catch (e) {
+      //   onError(e)
+      // }
     })()
 
     return socket

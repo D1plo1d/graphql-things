@@ -23,8 +23,9 @@ const client = new ApolloClient({
   }),
   cache: new InMemoryCache(),
 })
+console.log('hello stuff')
 
-// console.log('hello stuff')
+
 const App = () => (
   <ApolloProvider client={client}>
     <div>

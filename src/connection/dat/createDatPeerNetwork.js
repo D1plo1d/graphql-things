@@ -9,6 +9,7 @@ const createDatPeerNetwork = ({
   onError,
 }) => {
   let datPeers
+  let connected = false
 
   const datPeersPromise = (
     datPeersParam.then == null ? Promise.resolve(datPeersParam) : datPeersParam
@@ -19,8 +20,8 @@ const createDatPeerNetwork = ({
     onError,
     responseListeners: {
     },
-    keyFor: ({ peerID, sessionID }) => (
-      JSON.stringify({ peerID, sessionID })
+    keyFor: ({ datPeerID, sessionID }) => (
+      JSON.stringify({ datPeerID, sessionID })
     ),
     listenFor: (params, cb) => {
       network.responseListeners[network.keyFor(params)] = cb
@@ -28,7 +29,7 @@ const createDatPeerNetwork = ({
     removeListener: (params) => {
       delete network.responseListeners[network.keyFor(params)]
     },
-    onMessage: ({ datPeer, message }) => {
+    onMessage: ({ peer: datPeer, message }) => {
       console.log(datPeer.id, 'has sent the following message:', message)
 
       if (
@@ -46,7 +47,7 @@ const createDatPeerNetwork = ({
       }
 
       const key = network.keyFor({
-        peerID: datPeer.id,
+        datPeerID: datPeer.id,
         sessionID: message.sessionID,
       })
       const listener = network.responseListeners[key]
@@ -62,20 +63,20 @@ const createDatPeerNetwork = ({
       }
       network.responseListeners = {}
     },
+    connect: async () => {
+      if (connected) return
+      connected = true
+      console.log('connect?')
+      datPeers = await datPeersPromise
+
+      console.log('CONNNNN', await datPeers.list())
+
+      console.log(network.onMessage)
+      datPeers.addEventListener('message', () => console.log('waTTT'))
+      datPeers.addEventListener('message', network.onMessage)
+      console.log('CONNNNN DONE')
+    }
   }
-
-  datPeersPromise
-    .then((peers) => {
-      datPeers = peers
-      const t = async () => {
-        console.log(await peers.list())
-      }
-      t()
-
-      const addListener = datPeers.addListener ? 'addListener' : 'addEventListener'
-      datPeers[addListener]('message', network.onMessage)
-    })
-    .catch(onError)
 
   return network
 }

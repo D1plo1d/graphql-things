@@ -5,8 +5,9 @@ import ConnectionPath from '../connection/ConnectionPath'
 
 const browserDatPeers = (
   // eslint-disable-next-line no-undef
-  typeof experimental === 'undefined' ? null : experimental.peers
+  typeof experimental === 'undefined' ? null : experimental.datPeers
 )
+console.log(browserDatPeers)
 
 const ThingLink = ({
   identityKeys,
@@ -43,12 +44,12 @@ const ThingLink = ({
    */
   const sub = thingLink.subscriptionClient
   clearTimeout(sub.maxConnectTimeoutId)
-  sub.maxConnectTimeoutId = setTimeout(() => {
-    if (sub.status !== sub.wsImpl.OPEN) {
-      sub.reconnecting = true
-      sub.close(false, true)
-    }
-  }, 10000)
+  // sub.maxConnectTimeoutId = setTimeout(() => {
+  //   if (sub.status !== sub.wsImpl.OPEN) {
+  //     sub.reconnecting = true
+  //     sub.close(false, true)
+  //   }
+  // }, 10000)
 
   return thingLink
 }

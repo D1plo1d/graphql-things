@@ -24,6 +24,7 @@ const GraphqlThing = ({
   const datPeerNetwork = createDatPeerNetwork({
     datPeers,
   })
+  datPeerNetwork.connect()
 
   const socketServer = Object.assign(new EventEmitter(), {
     ...SOCKET_STATES,
@@ -34,7 +35,10 @@ const GraphqlThing = ({
     },
   })
 
+  console.log('LISTENING')
+
   datPeerNetwork.onHandshakeReq = async ({ datPeer, message }) => {
+    console.log('handshake received', { datPeer, message })
     const {
       sessionID,
       identityPublicKey: peerIdentityPublicKey,

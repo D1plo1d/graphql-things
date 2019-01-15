@@ -21,6 +21,10 @@ const dat = Dat.createNode({
 })
 const datPeers = dat.getPeers(DAT_URL)
 
+// datPeers.then(d => console.log('broadcast')
+//  || d.broadcast('hello!'))
+// datPeers.then(d => d.addEventListener('message', d =>  console.log(d)))
+
 /*
 * return true to allow the connection if an authorized user can be found with
 * the identity public key.
@@ -60,3 +64,7 @@ const options = {
 }
 
 SubscriptionServer.create(options, thing)
+
+console.log(
+  `Listening for Connections\n\nPublic Key: ${identityKeys.publicKey}`
+)

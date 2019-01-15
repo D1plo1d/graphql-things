@@ -24,6 +24,7 @@ const ConnectionPath = ({
   datPeerNetwork,
 }) => {
   // let initialConnection
+  console.log('START')
 
   if (initiator == null) {
     throw new Error('initiator cannot be null. Must be either true or false')
