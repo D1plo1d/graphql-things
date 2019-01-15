@@ -33,15 +33,22 @@ export const encrypt = async (data, { sessionKey }) => {
 
   const text = JSON.stringify(data)
 
-  const encryptedText = (
-    cipher.update(text, 'utf8', 'hex')
-    + cipher.final('hex')
-  )
+  const encryptedText = Buffer.concat([
+    cipher.update(text, 'utf8'),
+    cipher.final(),
+  ])
 
   const authTag = cipher.getAuthTag()
+  console.log({ sessionKey: sessionKey.toString('hex')})
 
   // prepend the initialization vector and auth tag to the encrypted text
-  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encryptedText}`
+  // console.log(
+  //   authTag.length,
+  //   iv.length,
+  //   encryptedText.length,
+  //   Buffer.concat([iv, authTag, encryptedText]).length - encryptedText.length,
+  // )
+  return Buffer.concat([iv, authTag, encryptedText]).toString('base64')
 }
 
 export const decrypt = (message, { sessionKey }) => {
@@ -49,11 +56,12 @@ export const decrypt = (message, { sessionKey }) => {
   if (typeof message !== 'string') {
     throw new Error('message must be a string')
   }
-
-  const [ivString, authTagString, encryptedText] = message.split(':')
-
-  const iv = Buffer.from(ivString, 'hex')
-  const authTag = Buffer.from(authTagString, 'hex')
+  console.log({ sessionKey: sessionKey.toString('hex')})
+  const bData = Buffer.from(message, 'base64')
+  const iv = bData.slice(0, IV_SIZE)
+  const authTag = bData.slice(IV_SIZE, IV_SIZE + 16)
+  const encryptedText = bData.slice(IV_SIZE + 16)
+  console.log(iv.length)
 
   const decipher = crypto.createDecipheriv(
     ENCRYPTION_ALGORITHM,
@@ -64,7 +72,7 @@ export const decrypt = (message, { sessionKey }) => {
   decipher.setAuthTag(authTag)
 
   const text = (
-    decipher.update(encryptedText, 'hex', 'utf8')
+    decipher.update(encryptedText, 'binary', 'utf8')
     + decipher.final('utf8')
   )
 

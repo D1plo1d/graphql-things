@@ -54,6 +54,7 @@ const EncryptedConnection = ({
     sessionID,
     send: async (data) => {
       const encryptedData = await encrypt(data, { sessionKey })
+      console.log(sessionKey.toString('hex'))
 
       currentConnection.send({
         sessionID,
@@ -66,7 +67,8 @@ const EncryptedConnection = ({
   })
 
   currentConnection.on('data', async ({ encryptedData }) => {
-    const data = await decrypt(encryptedData, { sessionKey })
+    console.log(sessionKey.toString('hex'))
+    const data = decrypt(encryptedData, { sessionKey })
 
     nextConnection.emit('data', data)
   })
