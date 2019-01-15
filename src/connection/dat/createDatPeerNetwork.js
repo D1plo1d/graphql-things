@@ -1,6 +1,5 @@
 import {
   HANDSHAKE_REQ,
-  MESSAGE_PROTOCOL_VERSION,
 } from '../../constants'
 
 const createDatPeerNetwork = ({
@@ -20,22 +19,18 @@ const createDatPeerNetwork = ({
     onError,
     responseListeners: {
     },
-    keyFor: ({ datPeerID, sessionID }) => (
-      JSON.stringify({ datPeerID, sessionID })
+    keyFor: (sessionID) => (
+      JSON.stringify(sessionID)
     ),
-    listenFor: (params, cb) => {
-      network.responseListeners[network.keyFor(params)] = cb
+    listenFor: (sessionID, cb) => {
+      network.responseListeners[network.keyFor(sessionID)] = cb
     },
-    removeListener: (params) => {
-      delete network.responseListeners[network.keyFor(params)]
+    removeListener: (sessionID) => {
+      delete network.responseListeners[network.keyFor(sessionID)]
     },
     onMessage: ({ peer: datPeer, message }) => {
       console.log(datPeer.id, 'has sent the following message:', message)
-
-      if (
-        typeof message !== 'object'
-        || message.protocolVersion !== MESSAGE_PROTOCOL_VERSION
-      ) {
+      if (typeof message !== 'object') {
         return
       }
 
@@ -46,10 +41,7 @@ const createDatPeerNetwork = ({
         return
       }
 
-      const key = network.keyFor({
-        datPeerID: datPeer.id,
-        sessionID: message.sessionID,
-      })
+      const key = network.keyFor(message.sessionID)
       const listener = network.responseListeners[key]
 
       if (listener != null) {
@@ -66,16 +58,10 @@ const createDatPeerNetwork = ({
     connect: async () => {
       if (connected) return
       connected = true
-      console.log('connect?')
       datPeers = await datPeersPromise
 
-      console.log('CONNNNN', await datPeers.list())
-
-      console.log(network.onMessage)
-      datPeers.addEventListener('message', () => console.log('waTTT'))
       datPeers.addEventListener('message', network.onMessage)
-      console.log('CONNNNN DONE')
-    }
+    },
   }
 
   return network

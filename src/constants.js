@@ -18,8 +18,6 @@ export const HANDSHAKE_ALGORITHM = 'triple-secp256k1-hkdf'
 
 export const PUBLIC_KEY_LENGTH = 32
 
-export const MESSAGE_PROTOCOL_VERSION = 'A'
-
 export const HANDSHAKE_REQ = 'HANDSHAKE_REQ'
 export const HANDSHAKE_RES = 'HANDSHAKE_RES'
 export const DATA = 'DATA'

@@ -12,6 +12,7 @@ const EncryptedConnection = ({
   // the connection request message if initiator = false
   request,
 }) => async ({
+  protocol,
   sessionID,
   currentConnection,
 }) => {
@@ -37,13 +38,13 @@ const EncryptedConnection = ({
   const peerIdentityPublicKey = await getKeys(peerIdentityPublicKeyParam)
 
   const handshake = initiator ? initiatorHandshake : receiverHandshake
-  console.log(1, { currentConnection })
 
   const {
     sessionKey,
   } = await handshake({
-    sessionID,
     currentConnection,
+    protocol,
+    sessionID,
     identityKeys,
     peerIdentityPublicKey,
     request,
@@ -54,14 +55,17 @@ const EncryptedConnection = ({
     send: async (data) => {
       const encryptedData = await encrypt(data, { sessionKey })
 
-      currentConnection.send(encryptedData)
+      currentConnection.send({
+        sessionID,
+        encryptedData,
+      })
     },
     close: () => {
       currentConnection.close()
     },
   })
 
-  currentConnection.on('data', async (encryptedData) => {
+  currentConnection.on('data', async ({ encryptedData }) => {
     const data = await decrypt(encryptedData, { sessionKey })
 
     nextConnection.emit('data', data)

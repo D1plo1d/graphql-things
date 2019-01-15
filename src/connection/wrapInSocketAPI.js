@@ -26,7 +26,7 @@ const wrapInSocketAPI = (params) => {
       connection.send(data)
     },
     close: () => {
-      console.log(new Error('close'))
+      console.log('socket close')
       throw new Error('close')
       if (connection != null) {
         connection.close()
@@ -110,6 +110,8 @@ const wrapInSocketAPI = (params) => {
     //   onError(e)
     // }
     })()
+
+    socket.protocol = protocol
 
     return socket
   }

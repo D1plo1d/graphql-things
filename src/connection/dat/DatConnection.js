@@ -3,16 +3,12 @@ import createDatPeerNetwork from './createDatPeerNetwork'
 
 const DatConnection = ({
   datPeer: datPeerParam,
-  datPeerID,
+  // datPeerID,
   datPeers,
   datPeerNetwork: externalDatNetwork,
 } = {}) => async ({
   sessionID,
 }) => {
-  console.log(
-    datPeerID,
-  )
-
   const datPeer = datPeerParam || { send: data => datPeers.broadcast(data) }
 
   /*
@@ -22,9 +18,6 @@ const DatConnection = ({
   const network = externalDatNetwork || createDatPeerNetwork({ datPeers })
   await network.connect()
 
-  const key = { datPeerID, sessionID }
-
-  console.log('STARTING DAT CONNECTION')
   // events: data, error
   const nextConnection = Connection({
     // TODO:  when https://github.com/beakerbrowser/beaker-core/pull/6 is
@@ -32,7 +25,7 @@ const DatConnection = ({
     // send: data => datPeers.broadcast(data),
     send: data => console.log('send', data) || datPeer.send(data),
     close: () => {
-      network.removeListener(key)
+      network.removeListener(sessionID)
 
       if (externalDatNetwork == null) {
         network.close()
@@ -42,7 +35,7 @@ const DatConnection = ({
     },
   })
 
-  network.listenFor(key, ({ message }) => {
+  network.listenFor(sessionID, ({ message }) => {
     console.log('RECEIVED', message)
     nextConnection.emit('data', message)
   })

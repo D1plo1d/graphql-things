@@ -2,7 +2,6 @@ import { ENCRYPTION_ALGORITHM } from '../p2pCrypto/encryption'
 
 import {
   HANDSHAKE_RES,
-  MESSAGE_PROTOCOL_VERSION,
   HANDSHAKE_ALGORITHM,
   PUBLIC_KEY_LENGTH,
 } from '../constants'
@@ -10,7 +9,7 @@ import {
 export const validateHandshakeRes = (handshakeReq) => {
   const {
     type,
-    protocolVersion,
+    protocol,
     handshakeAlgorithm,
     encryptionAlgorithm,
     identityPublicKey: idPK,
@@ -20,8 +19,8 @@ export const validateHandshakeRes = (handshakeReq) => {
   if (type !== HANDSHAKE_RES) {
     throw new Error('type must be HANDSHAKE_RES')
   }
-  if (protocolVersion !== MESSAGE_PROTOCOL_VERSION) {
-    throw new Error(`Unsupported protocolVersion: ${protocolVersion}`)
+  if (typeof protocol !== 'string') {
+    throw new Error(`Unsupported protocol: ${protocol}`)
   }
   if (handshakeAlgorithm !== HANDSHAKE_ALGORITHM) {
     throw new Error(`Unsupported handshakeAlgorithm: ${handshakeAlgorithm}`)
@@ -29,10 +28,10 @@ export const validateHandshakeRes = (handshakeReq) => {
   if (encryptionAlgorithm !== ENCRYPTION_ALGORITHM) {
     throw new Error(`Unsupported encryptionAlgorithm: ${encryptionAlgorithm}`)
   }
-  if (typeof idPK !== 'string' || idPK.length !== PUBLIC_KEY_LENGTH) {
+  if (typeof idPK !== 'string') {
     throw new Error(`Invalid peer identity public key: ${idPK}`)
   }
-  if (typeof epPK !== 'string' || epPK.length !== PUBLIC_KEY_LENGTH) {
+  if (typeof epPK !== 'string') {
     throw new Error(`Invalid peer ephemeral public key: ${epPK}`)
   }
 }
@@ -44,15 +43,16 @@ export const validateHandshakeRes = (handshakeReq) => {
 const handshakeResMessage = ({
   identityKeys,
   ephemeralKeys,
+  protocol,
   sessionID,
 }) => ({
   type: HANDSHAKE_RES,
-  protocolVersion: MESSAGE_PROTOCOL_VERSION,
+  protocol,
   sessionID,
   handshakeAlgorithm: HANDSHAKE_ALGORITHM,
   encryptionAlgorithm: ENCRYPTION_ALGORITHM,
-  identityPublicKey: identityKeys.public,
-  ephemeralPublicKey: ephemeralKeys.public,
+  identityPublicKey: identityKeys.publicKey,
+  ephemeralPublicKey: ephemeralKeys.publicKey,
 })
 
 export default handshakeResMessage

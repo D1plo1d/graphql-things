@@ -12,11 +12,19 @@ const setPeerSDP = ({ rtcPeer, peerSDP }) => {
   rtcPeer.signal(peerSDP)
 }
 
+const sdpArrivalTrigger = currentConnection => (
+  eventTrigger(currentConnection, 'data', {
+    filter: data => (
+      data.connection === 'upgrade'
+      && data.sdp != null
+    ),
+  })
+)
+
 /*
  * upgrades the current connection to a webRTC connection
  */
 const UpgradeToWebRTC = ({
-  peerSDP,
   wrtc,
   initiator,
 } = {}) => async ({
@@ -33,6 +41,8 @@ const UpgradeToWebRTC = ({
   })
 
   if (!initiator) {
+    const peerSDP = await sdpArrivalTrigger(currentConnection)
+    console.log({ peerSDP })
     setPeerSDP({ rtcPeer, peerSDP })
   }
 
@@ -48,12 +58,7 @@ const UpgradeToWebRTC = ({
     /*
      * if we initiated the webRTC upgrade wait until a SDP is sent back
      */
-    const response = await eventTrigger(currentConnection, 'data', {
-      filter: data => (
-        data.connection === 'upgrade'
-        && data.sdp != null
-      ),
-    })
+    const response = await sdpArrivalTrigger(currentConnection)
 
     setPeerSDP({ rtcPeer, peerSDP: response.dsp })
   }

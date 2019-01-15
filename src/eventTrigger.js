@@ -3,7 +3,7 @@ import Promise from 'any-promise'
 const eventTrigger = (eventEmitter, eventName, {
   map = result => result,
   filter = () => true,
-}) => (
+} = {}) => (
   new Promise((resolve, reject) => {
     const useBrowerAPI = eventEmitter.addEventListener != null
     const ADD = useBrowerAPI ? 'addEventListener' : 'on'

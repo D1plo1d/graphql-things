@@ -4,8 +4,9 @@ import handshakeResMessage from '../../../messages/handshakeResMessage'
 import { validateHandshakeReq } from '../../../messages/handshakeReqMessage'
 
 const receiverHandshake = async ({
-  sessionID,
   currentConnection,
+  protocol,
+  sessionID,
   identityKeys,
   peerIdentityPublicKey,
   request,
@@ -16,7 +17,7 @@ const receiverHandshake = async ({
   validateHandshakeReq(request)
 
   const ephemeralKeys = await createECDHKey()
-  console.log(2, { currentConnection })
+
   const sessionKey = await createSessionKey({
     isHandshakeInitiator: false,
     identityKeys,
@@ -29,6 +30,7 @@ const receiverHandshake = async ({
    * send a handshake response
    */
   const response = handshakeResMessage({
+    protocol,
     sessionID,
     identityKeys,
     ephemeralKeys,

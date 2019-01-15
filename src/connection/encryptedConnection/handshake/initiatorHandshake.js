@@ -7,8 +7,9 @@ import handshakeReqMessage from '../../../messages/handshakeReqMessage'
 import { validateHandshakeRes } from '../../../messages/handshakeResMessage'
 
 const initiatorHandshake = async ({
-  sessionID,
   currentConnection,
+  protocol,
+  sessionID,
   identityKeys,
   peerIdentityPublicKey,
 }) => {
@@ -20,6 +21,7 @@ const initiatorHandshake = async ({
   const request = handshakeReqMessage({
     identityKeys,
     ephemeralKeys,
+    protocol,
     sessionID,
   })
 
@@ -48,6 +50,7 @@ const initiatorHandshake = async ({
          * invalid messages may be caused by MITM attacks with invalid data so
          * ignore them all.
          */
+        // TODO: do not use exceptions for flow control
       }
     },
   })

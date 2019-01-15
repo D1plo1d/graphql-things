@@ -39,7 +39,6 @@ const GraphqlThing = ({
   console.log('LISTENING')
 
   datPeerNetwork.onHandshakeReq = async ({ datPeer, message }) => {
-    console.log('handshake received', { datPeer, message })
     const {
       sessionID,
       identityPublicKey: peerIdentityPublicKey,
@@ -63,13 +62,14 @@ const GraphqlThing = ({
       connectionPath,
       sessionID,
     })
-    const socket = createSocket(null, null)
+    const socket = createSocket(null, message.protocol)
 
     socketServer.emit('connection', socket)
   }
 
   datPeerNetwork.onError = (error) => {
     socketServer.emit('error', error)
+    throw new Error(error)
   }
 
   return socketServer

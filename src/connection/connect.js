@@ -1,5 +1,6 @@
 const connect = ({
   connectionPath,
+  protocol,
   sessionID,
   shouldAbortConnection,
 }) => {
@@ -7,6 +8,7 @@ const connect = ({
     currentConnectionPromise.then(async (currentConnection) => {
       const nextConnection = await nextConnectionFn({
         currentConnection,
+        protocol,
         sessionID,
       })
 
