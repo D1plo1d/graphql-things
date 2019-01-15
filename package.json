@@ -14,7 +14,8 @@
     "build-docs": "mmdc -i ./docs/connection-comparison.mmd -o ./docs/dist/connection-comparison.svg -t neutral -b transparent",
     "build": "babel src --out-dir dist && yarn build-example",
     "watch": "babel src --out-dir dist --watch",
-    "example": "cd ./example/ && yarn start"
+    "example": "cd ./example/ && yarn start",
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
@@ -44,9 +45,10 @@
     "eslint-plugin-monorepo": "^0.2.0",
     "eslint-plugin-react": "^7.11.0",
     "fast-async": "^6.3.8",
+    "graphql": "^14.0.2",
+    "jest": "^23.6.0",
     "mermaid": "^8.0.0",
     "mermaid.cli": "^0.5.1",
-    "graphql": "^14.0.2",
     "subscriptions-transport-ws": "^0.9.15"
   },
   "peerDependencies": {
