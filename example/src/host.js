@@ -25,6 +25,7 @@ const datPeers = dat.getPeers(DAT_URL)
 //  || d.broadcast('hello!'))
 // datPeers.then(d => d.addEventListener('message', d =>  console.log(d)))
 
+
 /*
 * return true to allow the connection if an authorized user can be found with
 * the identity public key.

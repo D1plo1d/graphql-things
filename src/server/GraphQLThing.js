@@ -54,12 +54,14 @@ const GraphqlThing = ({
       datPeers,
       datPeer,
       datPeerNetwork,
+      request: message,
     })
 
-    const socket = await wrapInSocketAPI({
+    const createSocket = wrapInSocketAPI({
       connectionPath,
       sessionID,
     })
+    const socket = createSocket(null, null)
 
     socketServer.emit('connection', socket)
   }

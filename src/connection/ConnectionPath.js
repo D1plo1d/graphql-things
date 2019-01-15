@@ -22,9 +22,9 @@ const ConnectionPath = ({
   datPeer,
   datPeerID,
   datPeerNetwork,
+  request,
 }) => {
   // let initialConnection
-  console.log('START')
 
   if (initiator == null) {
     throw new Error('initiator cannot be null. Must be either true or false')
@@ -58,6 +58,7 @@ const ConnectionPath = ({
       initiator,
       identityKeys,
       peerIdentityPublicKey,
+      request,
     }),
     // Exchange SDPs over the secure connection and switch to WebRTC
     UpgradeToWebRTC({

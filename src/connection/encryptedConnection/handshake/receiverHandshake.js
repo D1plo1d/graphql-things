@@ -17,6 +17,14 @@ const receiverHandshake = async ({
 
   const ephemeralKeys = await createECDHKey()
 
+  console.log({
+    isHandshakeInitiator: false,
+    identityKeys,
+    ephemeralKeys,
+    peerIdentityPublicKey,
+    peerEphemeralPublicKey: request.ephemeralPublicKey,
+
+  })
   const sessionKey = await createSessionKey({
     isHandshakeInitiator: false,
     identityKeys,

@@ -91,23 +91,23 @@ const wrapInSocketAPI = (params) => {
   const socketImpl = (url, protocol) => {
     (async () => {
       // try {
-        const {
-          sessionID = (await randomBytes(32)).toString('hex'),
-          connectionPath,
-        } = params
+      const {
+        sessionID = (await randomBytes(32)).toString('hex'),
+        connectionPath,
+      } = params
 
-        socket.sessionID = sessionID
+      socket.sessionID = sessionID
 
-        const nextConnection = await connect({
-          connectionPath,
-          sessionID,
-          protocol,
-          shouldAbortConnection,
-        })
-        onConnection(nextConnection)
-      // } catch (e) {
-      //   onError(e)
-      // }
+      const nextConnection = await connect({
+        connectionPath,
+        sessionID,
+        protocol,
+        shouldAbortConnection,
+      })
+      onConnection(nextConnection)
+    // } catch (e) {
+    //   onError(e)
+    // }
     })()
 
     return socket

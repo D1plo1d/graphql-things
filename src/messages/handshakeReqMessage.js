@@ -29,10 +29,10 @@ export const validateHandshakeReq = (handshakeReq) => {
   if (encryptionAlgorithm !== ENCRYPTION_ALGORITHM) {
     throw new Error(`Unsupported encryptionAlgorithm: ${encryptionAlgorithm}`)
   }
-  if (typeof idPK !== 'string' || idPK.length !== PUBLIC_KEY_LENGTH) {
+  if (typeof idPK !== 'string') {
     throw new Error(`Invalid peer identity public key: ${idPK}`)
   }
-  if (typeof epPK !== 'string' || epPK.length !== PUBLIC_KEY_LENGTH) {
+  if (typeof epPK !== 'string') {
     throw new Error(`Invalid peer ephemeral public key: ${epPK}`)
   }
 }
@@ -47,8 +47,8 @@ const handshakeReqMessage = ({
   sessionID,
   handshakeAlgorithm: HANDSHAKE_ALGORITHM,
   encryptionAlgorithm: ENCRYPTION_ALGORITHM,
-  identityPublicKey: identityKeys.public,
-  ephemeralPublicKey: ephemeralKeys.public,
+  identityPublicKey: identityKeys.publicKey,
+  ephemeralPublicKey: ephemeralKeys.publicKey,
 })
 
 export default handshakeReqMessage
