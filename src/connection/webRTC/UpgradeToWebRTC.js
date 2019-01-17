@@ -70,7 +70,7 @@ const UpgradeToWebRTC = ({
 
   // eslint-disable-next-line no-underscore-dangle
   const sendInChunks = chunkifier(rtcPeer._channel, (data) => {
-    console.log('tx', data)
+    // console.log('tx', data)
     rtcPeer.send(data)
   })
 
@@ -82,7 +82,7 @@ const UpgradeToWebRTC = ({
   })
 
   rtcPeer.on('data', dechunkifier((data) => {
-    console.log('rx', data)
+    // console.log('rx', data)
     nextConnection.emit('data', data)
   }))
 

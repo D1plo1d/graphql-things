@@ -70,10 +70,11 @@ const wrapInSocketAPI = (params) => {
 
     // relay connection events through the socket API
     connection.on('data', (data) => {
+      // console.log('RX SOCKET DATA', data)
       if (socket.onmessage != null) {
         socket.onmessage({ data })
       }
-      socket.emit('data', data)
+      socket.emit('message', data)
     })
 
     connection.on('close', () => {

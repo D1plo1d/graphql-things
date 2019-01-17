@@ -48,7 +48,7 @@ const App = () => (
           <div>
             <h2>GraphQL Things Example</h2>
             {data.books.map(book => (
-              <div>
+              <div key={`${book.title} - ${book.author}`}>
                 {`${book.title} - ${book.author}`}
               </div>
             ))

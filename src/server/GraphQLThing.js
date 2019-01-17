@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3'
 
+import eventTrigger from '../eventTrigger'
 import ConnectionPath from '../connection/ConnectionPath'
 import createDatPeerNetwork from '../connection/dat/createDatPeerNetwork'
 import wrapInSocketAPI, { SOCKET_STATES } from '../connection/wrapInSocketAPI'
@@ -61,6 +62,8 @@ const GraphqlThing = ({
       sessionID,
     })
     const socket = createSocket(null, message.protocol)
+
+    await eventTrigger(socket, 'open')
 
     socketServer.emit('connection', socket)
   }

@@ -52,13 +52,13 @@ const options = {
   // the onOperation function is called for every new operation
   // and we use it to inject context to track the session and
   // user
-  onOperation: async (msg, params, socket) => ({
-    ...params,
-    context: {
-      sessionID: socket.sessionID,
-      peerIdentityPublicKey: socket.peerIdentityPublicKey,
-    },
-  }),
+  // onOperation: async (msg, params, socket) => ({
+  //   ...params,
+  //   context: {
+  //     sessionID: socket.sessionID,
+  //     peerIdentityPublicKey: socket.peerIdentityPublicKey,
+  //   },
+  // }),
 }
 
 SubscriptionServer.create(options, thing)
