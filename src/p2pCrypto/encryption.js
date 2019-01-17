@@ -39,7 +39,6 @@ export const encrypt = async (data, { sessionKey }) => {
   ])
 
   const authTag = cipher.getAuthTag()
-  console.log({ sessionKey: sessionKey.toString('hex')})
 
   // prepend the initialization vector and auth tag to the encrypted text
   // console.log(
@@ -56,7 +55,7 @@ export const decrypt = (message, { sessionKey }) => {
   if (typeof message !== 'string') {
     throw new Error('message must be a string')
   }
-  console.log({ sessionKey: sessionKey.toString('hex')})
+
   const bData = Buffer.from(message, 'base64')
   const iv = bData.slice(0, IV_SIZE)
   const authTag = bData.slice(IV_SIZE, IV_SIZE + 16)

@@ -49,6 +49,7 @@ const EncryptedConnection = ({
     peerIdentityPublicKey,
     request,
   })
+  console.log({ sessionKey: sessionKey.toString('hex')})
 
   const nextConnection = Connection({
     sessionID,

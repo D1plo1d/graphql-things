@@ -28,7 +28,7 @@ const kdf = (km) => {
   const hashOutputLength = 32
   const f = String.fromCharCode(0xFF).repeat(32)
 
-  const inputKeyMaterial = `${f}${km.toString()}`
+  const inputKeyMaterial = `${f}${km.toString('binary')}`
 
   const salt = String.fromCharCode(0x00).repeat(hashOutputLength)
 
