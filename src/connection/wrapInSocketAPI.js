@@ -72,7 +72,10 @@ const wrapInSocketAPI = (params) => {
 
     // relay connection events through the socket API
     connection.on('data', (data) => {
-      socket.onmessage({ data })
+      if (socket.onmessage != null) {
+        socket.onmessage({ data })
+      }
+      socket.emit('data', data)
     })
 
     connection.on('close', () => {

@@ -6,20 +6,21 @@ import { chunkifier, dechunkifier } from './chunk'
 import webRTCUpgradeMessage from '../../messages/webRTCUpgradeMessage'
 
 const setPeerSDP = ({ rtcPeer, peerSDP }) => {
-  if (typeof peerSDP !== 'string') {
+  if (typeof peerSDP !== 'object') {
     throw new Error('invalid SDP')
   }
   rtcPeer.signal(peerSDP)
 }
 
-const sdpArrivalTrigger = currentConnection => (
-  eventTrigger(currentConnection, 'data', {
+const sdpArrivalTrigger = async (currentConnection) => {
+  const message = await eventTrigger(currentConnection, 'data', {
     filter: data => (
       data.connection === 'upgrade'
       && data.sdp != null
     ),
   })
-)
+  return message.sdp
+}
 
 /*
  * upgrades the current connection to a webRTC connection
@@ -37,12 +38,11 @@ const UpgradeToWebRTC = ({
   })
 
   rtcPeer.on('iceStateChange', (state) => {
-    if (state === 'disconnected') rtcPeer.close()
+    if (state === 'disconnected') rtcPeer.destroy()
   })
 
   if (!initiator) {
     const peerSDP = await sdpArrivalTrigger(currentConnection)
-    console.log({ peerSDP })
     setPeerSDP({ rtcPeer, peerSDP })
   }
 
@@ -58,9 +58,8 @@ const UpgradeToWebRTC = ({
     /*
      * if we initiated the webRTC upgrade wait until a SDP is sent back
      */
-    const response = await sdpArrivalTrigger(currentConnection)
-
-    setPeerSDP({ rtcPeer, peerSDP: response.dsp })
+    const peerSDP = await sdpArrivalTrigger(currentConnection)
+    setPeerSDP({ rtcPeer, peerSDP })
   }
 
   await eventTrigger(rtcPeer, 'connect')
@@ -71,7 +70,7 @@ const UpgradeToWebRTC = ({
 
   // eslint-disable-next-line no-underscore-dangle
   const sendInChunks = chunkifier(rtcPeer._channel, (data) => {
-    // console.log('tx', data)
+    console.log('tx', data)
     rtcPeer.send(data)
   })
 
@@ -83,7 +82,7 @@ const UpgradeToWebRTC = ({
   })
 
   rtcPeer.on('data', dechunkifier((data) => {
-    // console.log('rx', data)
+    console.log('rx', data)
     nextConnection.emit('data', data)
   }))
 

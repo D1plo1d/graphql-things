@@ -15,7 +15,7 @@ const eventTrigger = (eventEmitter, eventName, {
     const eventListener = async (result) => {
       let mappedResult = map(result)
 
-      if (mappedResult.then != null) {
+      if (mappedResult != null && mappedResult.then != null) {
         mappedResult = await mappedResult
       }
 
