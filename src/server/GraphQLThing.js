@@ -36,8 +36,6 @@ const GraphqlThing = ({
     },
   })
 
-  console.log('LISTENING')
-
   datPeerNetwork.onHandshakeReq = async ({ datPeer, message }) => {
     const {
       sessionID,

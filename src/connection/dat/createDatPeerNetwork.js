@@ -29,7 +29,6 @@ const createDatPeerNetwork = ({
       delete network.responseListeners[network.keyFor(sessionID)]
     },
     onMessage: ({ peer: datPeer, message }) => {
-      console.log(datPeer.id, 'has sent the following message:', message)
       if (typeof message !== 'object') {
         return
       }

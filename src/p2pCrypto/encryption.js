@@ -60,7 +60,6 @@ export const decrypt = (message, { sessionKey }) => {
   const iv = bData.slice(0, IV_SIZE)
   const authTag = bData.slice(IV_SIZE, IV_SIZE + 16)
   const encryptedText = bData.slice(IV_SIZE + 16)
-  console.log(iv.length)
 
   const decipher = crypto.createDecipheriv(
     ENCRYPTION_ALGORITHM,

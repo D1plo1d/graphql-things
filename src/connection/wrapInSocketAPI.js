@@ -26,7 +26,7 @@ const wrapInSocketAPI = (params) => {
       connection.send(data)
     },
     close: () => {
-      console.log('socket close')
+      // console.log('socket close')
       if (connection != null) {
         connection.close()
       }
@@ -35,7 +35,7 @@ const wrapInSocketAPI = (params) => {
   })
 
   const onError = (error) => {
-    console.log('socket error')
+    // console.log('socket error')
     socket.readyState = SOCKET_STATES.CLOSED
 
     if (socket.onerror == null && socket.listenerCount('error' === 0)) {

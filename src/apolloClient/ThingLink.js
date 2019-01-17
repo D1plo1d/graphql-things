@@ -7,7 +7,6 @@ const browserDatPeers = (
   // eslint-disable-next-line no-undef
   typeof experimental === 'undefined' ? null : experimental.datPeers
 )
-console.log(browserDatPeers)
 
 const ThingLink = ({
   identityKeys,

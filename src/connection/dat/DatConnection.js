@@ -23,7 +23,7 @@ const DatConnection = ({
     // TODO:  when https://github.com/beakerbrowser/beaker-core/pull/6 is
     // released switch this away from broadcast to use a peer-specific channel.
     // send: data => datPeers.broadcast(data),
-    send: data => console.log('send', data) || datPeer.send(data),
+    send: data => datPeer.send(data),
     close: () => {
       network.removeListener(sessionID)
 
@@ -36,11 +36,9 @@ const DatConnection = ({
   })
 
   network.listenFor(sessionID, ({ message }) => {
-    console.log('RECEIVED', message)
     nextConnection.emit('data', message)
   })
 
-  console.log('dat connection')
   return nextConnection
 }
 
