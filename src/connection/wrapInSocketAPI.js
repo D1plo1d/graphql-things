@@ -27,12 +27,10 @@ const wrapInSocketAPI = (params) => {
     },
     close: () => {
       console.log('socket close')
-      throw new Error('close')
       if (connection != null) {
         connection.close()
-      } else {
-        socket.readyState = SOCKET_STATES.CLOSED
       }
+      socket.readyState = SOCKET_STATES.CLOSED
     },
   })
 
