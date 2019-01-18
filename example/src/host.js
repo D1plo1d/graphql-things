@@ -8,6 +8,7 @@ import { GraphQLThing } from 'graphql-things'
 
 import schema from './schema'
 import keys from '../keys/keys.json'
+import * as qrcode from 'qrcode-terminal'
 
 const {
   clientKeys,
@@ -63,6 +64,21 @@ const options = {
 
 SubscriptionServer.create(options, thing)
 
-const { publicKey } = identityKeys
-// eslint-disable-next-line no-console
-console.log(`Listening for Connections\n\nPublic Key: ${publicKey}`)
+const inviteJSON = {
+  peerIdentityPublicKey: keys.hostKeys.publicKey,
+  identityKeys: keys.clientKeys,
+}
+const inviteString = Buffer.from(JSON.stringify(inviteJSON)).toString('base64')
+
+qrcode.generate(inviteString, { small: true }, (qr) => {
+  // eslint-disable-next-line no-console
+  console.log(
+    // eslint-disable-next-line prefer-template
+    `Listening for Connections\n\nPublic Key: ${identityKeys.publicKey}\n\n`
+    + 'Invite Code QR Code:\n\n'
+    + qr
+    + '\n\n'
+    + 'Invite Code String:\n\n'
+    + inviteString,
+  )
+})
