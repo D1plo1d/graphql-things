@@ -73,7 +73,7 @@ const App = () => {
         <QRReader
           onScan={(inviteMsg) => {
             if (inviteMsg != null) {
-              setClient(createClient(inviteMsg, 'binary'))
+              setClient(createClient(inviteMsg, 'hex'))
             }
           }}
           onError={(error) => {

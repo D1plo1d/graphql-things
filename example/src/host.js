@@ -30,7 +30,7 @@ const datPeers = dat.getPeers(DAT_URL)
 */
 const authenticate = ({ peerIdentityPublicKey }) => {
   // eslint-disable-next-line no-console
-  console.log(`New connection from ${peerIdentityPublicKey}`)
+  console.log(`\n\nNew connection from ${peerIdentityPublicKey}`)
 
   /*
    * IMPORTANT: REPLACE THIS CODE!
@@ -70,10 +70,9 @@ const inviteJSON = {
   peerIPK: Buffer.from(keys.hostKeys.publicKey, 'hex'),
   isk: Buffer.from(keys.clientKeys.privateKey, 'hex'),
 }
-const inviteMsg = msgpack.encode(inviteJSON)
-const inviteString = inviteMsg.toString('base64')
+const inviteMsg = msgpack.encode(inviteJSON).toString('base64')
 
-qrcode.generate(inviteMsg.toString('binary'), { small: true }, (qr) => {
+qrcode.generate(inviteMsg, { small: true }, (qr) => {
   // eslint-disable-next-line no-console
   console.log(
     // eslint-disable-next-line prefer-template
@@ -82,6 +81,6 @@ qrcode.generate(inviteMsg.toString('binary'), { small: true }, (qr) => {
     + qr
     + '\n\n'
     + 'Invite Code String:\n\n'
-    + inviteString,
+    + inviteMsg,
   )
 })
