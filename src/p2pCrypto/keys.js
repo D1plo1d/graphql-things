@@ -3,6 +3,10 @@ import hkdf from 'futoin-hkdf'
 import eccrypto from 'eccrypto'
 import randomBytes from './randomBytes'
 
+export const getPublicKey = privateKey => (
+  eccrypto.getPublic(Buffer.from(privateKey, 'hex')).toString('hex')
+)
+
 export const createECDHKey = async () => {
   const privateKey = await randomBytes(32)
   const publicKey = eccrypto.getPublic(privateKey).toString('hex')

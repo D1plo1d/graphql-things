@@ -1,4 +1,7 @@
-export { createECDHKey } from './p2pCrypto/keys'
+export {
+  createECDHKey,
+  getPublicKey,
+} from './p2pCrypto/keys'
 
 /*
  * Client

@@ -6,9 +6,11 @@ import { SubscriptionServer } from 'subscriptions-transport-ws'
 
 import { GraphQLThing } from 'graphql-things'
 
+import * as qrcode from 'qrcode-terminal'
+import msgpack from 'msgpack-lite'
+
 import schema from './schema'
 import keys from '../keys/keys.json'
-import * as qrcode from 'qrcode-terminal'
 
 const {
   clientKeys,
@@ -65,12 +67,13 @@ const options = {
 SubscriptionServer.create(options, thing)
 
 const inviteJSON = {
-  peerIdentityPublicKey: keys.hostKeys.publicKey,
-  identityKeys: keys.clientKeys,
+  peerIPK: Buffer.from(keys.hostKeys.publicKey, 'hex'),
+  isk: Buffer.from(keys.clientKeys.privateKey, 'hex'),
 }
-const inviteString = Buffer.from(JSON.stringify(inviteJSON)).toString('base64')
+const inviteMsg = msgpack.encode(inviteJSON)
+const inviteString = inviteMsg.toString('base64')
 
-qrcode.generate(inviteString, { small: true }, (qr) => {
+qrcode.generate(inviteMsg.toString('binary'), { small: true }, (qr) => {
   // eslint-disable-next-line no-console
   console.log(
     // eslint-disable-next-line prefer-template
