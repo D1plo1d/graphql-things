@@ -4,10 +4,9 @@ import wrtc from 'wrtc'
 import { execute, subscribe } from 'graphql'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 
-import { GraphQLThing } from 'graphql-things'
+import { GraphQLThing, getInviteCode } from 'graphql-things'
 
 import * as qrcode from 'qrcode-terminal'
-import msgpack from 'msgpack-lite'
 
 import schema from './schema'
 import keys from '../keys/keys.json'
@@ -16,6 +15,11 @@ const {
   clientKeys,
   hostKeys: identityKeys,
 } = keys
+
+const inviteCode = getInviteCode({
+  identityKeys,
+  inviteKeys: clientKeys,
+})
 
 // instantiate the dat node
 const DAT_URL = 'dat://c53b89f627481422ad71a646c547105de1509b4b4552bb18c71e4be200b7ef4c/'
@@ -66,13 +70,7 @@ const options = {
 
 SubscriptionServer.create(options, thing)
 
-const inviteJSON = {
-  peerIPK: Buffer.from(keys.hostKeys.publicKey, 'hex'),
-  isk: Buffer.from(keys.clientKeys.privateKey, 'hex'),
-}
-const inviteMsg = msgpack.encode(inviteJSON).toString('base64')
-
-qrcode.generate(inviteMsg, { small: true }, (qr) => {
+qrcode.generate(inviteCode, { small: true }, (qr) => {
   // eslint-disable-next-line no-console
   console.log(
     // eslint-disable-next-line prefer-template
@@ -81,6 +79,6 @@ qrcode.generate(inviteMsg, { small: true }, (qr) => {
     + qr
     + '\n\n'
     + 'Invite Code String:\n\n'
-    + inviteMsg,
+    + inviteCode,
   )
 })

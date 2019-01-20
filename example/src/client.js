@@ -7,26 +7,22 @@ import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 
 import QRReader from 'react-qr-reader'
-import msgpack from 'msgpack-lite'
 
-import { ThingLink, getPublicKey } from 'graphql-things'
+import { ThingLink, parseInviteCode } from 'graphql-things'
 
-const createClient = (inviteString, encoding) => {
-  let json
+const createClient = (inviteCode) => {
+  let invite
 
   try {
-    const inviteMsg = encoding === 'hex' ? atob(inviteString) : inviteString
-
-    json = msgpack.decode(Buffer.from(inviteMsg, 'binary'))
+    invite = parseInviteCode(inviteCode)
   } catch {
     return null
   }
 
-  const identityKeys = {
-    publicKey: getPublicKey(json.isk.toString('hex')),
-    privateKey: json.isk.toString('hex'),
-  }
-  const peerIdentityPublicKey = json.peerIPK.toString('hex')
+  const {
+    identityKeys,
+    peerIdentityPublicKey,
+  } = invite
 
   return new ApolloClient({
     link: ThingLink({
@@ -65,7 +61,7 @@ const App = () => {
           <h2>GraphQL Thing Login</h2>
           <input
             type="text"
-            onChange={e => setClient(createClient(e.target.value, 'hex'))}
+            onChange={e => setClient(createClient(e.target.value))}
             placeholder="Enter your Invite Code"
             style={{ width: '100%' }}
           />
@@ -73,7 +69,7 @@ const App = () => {
         <QRReader
           onScan={(inviteMsg) => {
             if (inviteMsg != null) {
-              setClient(createClient(inviteMsg, 'hex'))
+              setClient(createClient(inviteMsg))
             }
           }}
           onError={(error) => {

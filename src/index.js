@@ -3,6 +3,12 @@ export {
   getPublicKey,
 } from './p2pCrypto/keys'
 
+export {
+  createInvite,
+  getInviteCode,
+  parseInviteCode,
+} from './inviteCodes'
+
 /*
  * Client
  */
