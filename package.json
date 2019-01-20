@@ -7,6 +7,10 @@
   "author": "Rob Gilson",
   "license": "MIT",
   "private": false,
+  "files": [
+    "dist/*",
+    "dist/**/*"
+  ],
   "scripts": {
     "bootstrap": "yarn && yarn build && yarn build-example && yarn create-example-keys",
     "build-example": "cd ./example && npx webpack --mode=development",
