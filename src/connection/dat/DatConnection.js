@@ -3,7 +3,8 @@ import Debug from 'debug'
 import Connection from '../Connection'
 import createDatPeerNetwork from './createDatPeerNetwork'
 
-const debug = Debug('graphql-things:dat')
+const rxDebug = Debug('graphql-things:dat:rx')
+const txDebug = Debug('graphql-things:dat:tx')
 
 const DatConnection = ({
   datPeer: datPeerParam,
@@ -28,7 +29,7 @@ const DatConnection = ({
     // released switch this away from broadcast to use a peer-specific channel.
     // send: data => datPeers.broadcast(data),
     send: (data) => {
-      debug(`TX: ${JSON.stringify(data)}`)
+      txDebug(data)
       return datPeer.send(data)
     },
     close: () => {
@@ -43,7 +44,7 @@ const DatConnection = ({
   })
 
   network.listenFor(sessionID, ({ message }) => {
-    debug(`RX: ${JSON.stringify(message)}`)
+    rxDebug(message)
     nextConnection.emit('data', message)
   })
 

@@ -1,7 +1,10 @@
+import Debug from 'debug'
 import EventEmitter from 'eventemitter3'
 
 import randomBytes from '../p2pCrypto/randomBytes'
 import connect from './connect'
+
+const debug = Debug('graphql-things:socket')
 
 export const SOCKET_STATES = {
   CONNECTING: 0,
@@ -17,35 +20,60 @@ export const SOCKET_STATES = {
  */
 const wrapInSocketAPI = (params) => {
   let connection = null
-  const socket = Object.assign(new EventEmitter(), {
+  const socket = new EventEmitter()
+
+  const onError = (error) => {
+    const listeners = socket.listenerCount('error')
+    const hasOnError = socket.onerror != null
+    const hasListener = hasOnError || listeners > 0
+
+    socket.readyState = SOCKET_STATES.CLOSED
+
+    if (hasListener === false) {
+      throw new Error(error)
+    }
+
+    debug(
+      `error (has onerror? ${hasOnError}, listeners = ${listeners})`,
+      error,
+    )
+
+    if (socket.onerror != null) {
+      socket.onerror(new Error(error))
+    } else {
+      socket.emit('error', new Error(error))
+    }
+  }
+
+  const closeSocket = () => {
+    if (socket.readyState === SOCKET_STATES.CLOSED) {
+      // only close the socket once
+      return
+    }
+
+    debug('close')
+    socket.readyState = SOCKET_STATES.CLOSED
+    if (socket.onclose != null) {
+      socket.onclose()
+    }
+    socket.emit('close')
+  }
+
+  Object.assign(socket, {
     readyState: SOCKET_STATES.CONNECTING,
     send: (data) => {
       if (socket.readyState !== SOCKET_STATES.OPEN) {
         throw new Error('Cannot call send on a closed connection')
       }
-      connection.send(data)
+      connection.send(data).catch(onError)
     },
     close: () => {
-      // console.log('socket close')
       if (connection != null) {
         connection.close()
       }
-      socket.readyState = SOCKET_STATES.CLOSED
+      closeSocket()
     },
   })
-
-  const onError = (error) => {
-    // console.log('socket error')
-    socket.readyState = SOCKET_STATES.CLOSED
-
-    if (socket.onerror == null && socket.listenerCount('error' === 0)) {
-      throw new Error(error)
-    }
-    if (socket.onerror != null) {
-      socket.onerror(error)
-    }
-    socket.emit('error', error)
-  }
 
   const shouldAbortConnection = () => (
     socket.readyState !== SOCKET_STATES.CONNECTING
@@ -54,6 +82,7 @@ const wrapInSocketAPI = (params) => {
   const onConnection = (nextConnection) => {
     if (shouldAbortConnection()) {
       nextConnection.close()
+      socket.close()
       return
     }
 
@@ -62,6 +91,7 @@ const wrapInSocketAPI = (params) => {
     // set the state and relay an open event through the socket
     socket.readyState = SOCKET_STATES.OPEN
 
+    debug('open')
     if (socket.onopen != null) {
       socket.onopen()
     }
@@ -78,11 +108,7 @@ const wrapInSocketAPI = (params) => {
     })
 
     connection.on('close', () => {
-      socket.readyState = SOCKET_STATES.CLOSED
-      if (socket.onclose != null) {
-        socket.onclose()
-      }
-      socket.emit('close')
+      closeSocket()
     })
 
     connection.on('error', onError)
@@ -92,8 +118,7 @@ const wrapInSocketAPI = (params) => {
    * mimic the websocket API
    */
   const socketImpl = (url, protocol) => {
-    (async () => {
-      // try {
+    const connectionPromise = (async () => {
       const {
         sessionID = (await randomBytes(32)).toString('hex'),
         connectionPath,
@@ -108,10 +133,9 @@ const wrapInSocketAPI = (params) => {
         shouldAbortConnection,
       })
       onConnection(nextConnection)
-    // } catch (e) {
-    //   onError(e)
-    // }
     })()
+
+    connectionPromise.catch(onError)
 
     socket.protocol = protocol
 

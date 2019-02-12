@@ -9,10 +9,15 @@ const eventTrigger = (eventEmitter, eventName, {
     const ADD = useBrowerAPI ? 'addEventListener' : 'on'
     const REMOVE = useBrowerAPI ? 'removeEventListener' : 'removeListener'
 
+    let eventListener
+
     const errorListener = (error) => {
-      reject(error)
+      eventEmitter[REMOVE]('error', errorListener)
+      eventEmitter[REMOVE](eventName, eventListener)
+      reject(new Error(error))
     }
-    const eventListener = async (result) => {
+
+    eventListener = async (result) => {
       let mappedResult = map(result)
 
       if (mappedResult != null && mappedResult.then != null) {

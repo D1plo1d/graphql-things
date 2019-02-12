@@ -45,7 +45,7 @@ const GraphqlThing = ({
     },
   })
 
-  datPeerNetwork.onHandshakeReq = async ({ datPeer, message }) => {
+  const handleHandshakeReq = async ({ datPeer, message }) => {
     const {
       sessionID,
       identityPublicKey: peerIdentityPublicKey,
@@ -80,6 +80,12 @@ const GraphqlThing = ({
     await eventTrigger(socket, 'open')
 
     socketServer.emit('connection', socket)
+  }
+
+  datPeerNetwork.onHandshakeReq = (params) => {
+    handleHandshakeReq(params).catch((e) => {
+      debug('error', e)
+    })
   }
 
   datPeerNetwork.onError = (error) => {

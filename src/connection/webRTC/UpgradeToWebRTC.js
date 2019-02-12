@@ -8,6 +8,8 @@ import { chunkifier, dechunkifier } from './chunk'
 import webRTCUpgradeMessage from '../../messages/webRTCUpgradeMessage'
 
 const debug = Debug('graphql-things:webrtc')
+const rxDebug = Debug('graphql-things:webrtc:rx')
+const txDebug = Debug('graphql-things:webrtc:tx')
 
 const setPeerSDP = ({ rtcPeer, peerSDP }) => {
   if (typeof peerSDP !== 'object') {
@@ -81,7 +83,7 @@ const UpgradeToWebRTC = ({
 
   // eslint-disable-next-line no-underscore-dangle
   const sendInChunks = chunkifier(rtcPeer._channel, (data) => {
-    // console.log('tx', data)
+    txDebug(data)
     rtcPeer.send(data)
   })
 
@@ -92,14 +94,16 @@ const UpgradeToWebRTC = ({
     close: () => rtcPeer.destroy(),
   })
 
+  const onError = (error) => {
+    nextConnection.emit('error', error)
+  }
+
   rtcPeer.on('data', dechunkifier((data) => {
-    // console.log('rx', data)
+    rxDebug(data)
     nextConnection.emit('data', data)
   }))
 
-  rtcPeer.on('error', () => {
-    nextConnection.emit('error')
-  })
+  rtcPeer.on('error', onError)
 
   rtcPeer.on('close', () => {
     debug('disconnected')

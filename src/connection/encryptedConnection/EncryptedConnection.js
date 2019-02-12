@@ -65,15 +65,20 @@ const EncryptedConnection = ({
     },
   })
 
-  currentConnection.on('data', async ({ encryptedData }) => {
-    const data = decrypt(encryptedData, { sessionKey })
-
-    nextConnection.emit('data', data)
-  })
-
-  currentConnection.on('error', (error) => {
+  const onError = (error) => {
     nextConnection.emit('error', error)
+  }
+
+  const onData = async ({ encryptedData }) => {
+    const data = decrypt(encryptedData, { sessionKey })
+    nextConnection.emit('data', data)
+  }
+
+  currentConnection.on('data', (message) => {
+    onData(message).catch(onError)
   })
+
+  currentConnection.on('error', onError)
 
   currentConnection.on('close', () => {
     nextConnection.emit('close')
