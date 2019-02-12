@@ -36,6 +36,7 @@ export const validateHandshakeReq = (handshakeReq) => {
 }
 
 const handshakeReqMessage = ({
+  peerIdentityPublicKey,
   identityKeys,
   ephemeralKeys,
   protocol,
@@ -46,6 +47,7 @@ const handshakeReqMessage = ({
   sessionID,
   handshakeAlgorithm: HANDSHAKE_ALGORITHM,
   encryptionAlgorithm: ENCRYPTION_ALGORITHM,
+  peerIdentityPublicKey,
   identityPublicKey: identityKeys.publicKey,
   ephemeralPublicKey: ephemeralKeys.publicKey,
 })

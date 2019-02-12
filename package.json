@@ -18,7 +18,7 @@
     "build-docs": "mmdc -i ./docs/connection-comparison.mmd -o ./docs/dist/connection-comparison.svg -t neutral -b transparent",
     "build": "babel src --out-dir dist && yarn build-example",
     "watch": "babel src --out-dir dist --watch",
-    "example": "cd ./example/ && yarn start",
+    "example": "cd ./example/ && DEBUG=\"*,-babel:*\" yarn start",
     "test": "jest"
   },
   "devDependencies": {
@@ -58,12 +58,13 @@
   },
   "peerDependencies": {
     "graphql": "^14.0.2",
-    "subscriptions-transport-ws": "^0.9.15",
-    "msgpack-lite": "^0.1.26"
+    "msgpack-lite": "^0.1.26",
+    "subscriptions-transport-ws": "^0.9.15"
   },
   "dependencies": {
     "any-promise": "^1.3.0",
     "apollo-link-ws": "^1.0.12",
+    "debug": "^4.1.1",
     "eccrypto": "^1.1.0",
     "eventemitter3": "^3.1.0",
     "futoin-hkdf": "^1.0.3",

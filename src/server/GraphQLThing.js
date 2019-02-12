@@ -1,9 +1,12 @@
 import EventEmitter from 'eventemitter3'
+import Debug from 'debug'
 
 import eventTrigger from '../eventTrigger'
 import ConnectionPath from '../connection/ConnectionPath'
 import createDatPeerNetwork from '../connection/dat/createDatPeerNetwork'
 import wrapInSocketAPI, { SOCKET_STATES } from '../connection/wrapInSocketAPI'
+
+const debug = Debug('graphql-things:connection')
 
 /*
  * creates a new WebsocketServer API-compatible GraphQLThing
@@ -27,6 +30,11 @@ const GraphqlThing = ({
     datPeers,
   })
   datPeerNetwork.connect()
+    .then(() => {
+      debug('listening for dat peers')
+    }).catch((e) => {
+      throw new Error(e)
+    })
 
   const socketServer = Object.assign(new EventEmitter(), {
     ...SOCKET_STATES,
@@ -42,6 +50,12 @@ const GraphqlThing = ({
       sessionID,
       identityPublicKey: peerIdentityPublicKey,
     } = message
+
+    if (message.peerIdentityPublicKey !== identityKeys.publicKey) {
+      return
+    }
+
+    debug(`new connection from ${peerIdentityPublicKey}`)
 
     if (sessionIDs.includes(sessionID)) return
     if (authenticate({ peerIdentityPublicKey }) === false) return

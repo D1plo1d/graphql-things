@@ -19,6 +19,7 @@ const initiatorHandshake = async ({
    * send a handshake request
    */
   const request = handshakeReqMessage({
+    peerIdentityPublicKey,
     identityKeys,
     ephemeralKeys,
     protocol,

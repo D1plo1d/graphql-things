@@ -1,9 +1,13 @@
+import Debug from 'debug'
+
 import Peer from 'simple-peer'
 import Connection from '../Connection'
 
 import eventTrigger from '../../eventTrigger'
 import { chunkifier, dechunkifier } from './chunk'
 import webRTCUpgradeMessage from '../../messages/webRTCUpgradeMessage'
+
+const debug = Debug('graphql-things:webrtc')
 
 const setPeerSDP = ({ rtcPeer, peerSDP }) => {
   if (typeof peerSDP !== 'object') {
@@ -13,6 +17,7 @@ const setPeerSDP = ({ rtcPeer, peerSDP }) => {
 }
 
 const sdpArrivalTrigger = async (currentConnection) => {
+  debug('awaiting SDP')
   const message = await eventTrigger(currentConnection, 'data', {
     filter: data => (
       data.connection === 'upgrade'
@@ -38,7 +43,10 @@ const UpgradeToWebRTC = ({
   })
 
   rtcPeer.on('iceStateChange', (state) => {
-    if (state === 'disconnected') rtcPeer.destroy()
+    if (state === 'disconnected') {
+      debug('iceState changed to disconnected')
+      rtcPeer.destroy()
+    }
   })
 
   if (!initiator) {
@@ -52,6 +60,7 @@ const UpgradeToWebRTC = ({
    */
   const sdp = await eventTrigger(rtcPeer, 'signal')
 
+  debug('sending upgrade message')
   await currentConnection.send(webRTCUpgradeMessage({ protocol, sdp }))
 
   if (initiator) {
@@ -62,7 +71,9 @@ const UpgradeToWebRTC = ({
     setPeerSDP({ rtcPeer, peerSDP })
   }
 
+  debug('connecting...')
   await eventTrigger(rtcPeer, 'connect')
+  debug('connected')
 
   /*
    * Wrap the webRTC peer in a Connection object
@@ -91,6 +102,7 @@ const UpgradeToWebRTC = ({
   })
 
   rtcPeer.on('close', () => {
+    debug('disconnected')
     nextConnection.emit('close')
   })
 
