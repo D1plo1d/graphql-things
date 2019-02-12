@@ -66,8 +66,6 @@ const wrapInSocketAPI = (params) => {
         throw new Error('Cannot call send on a closed connection')
       }
       connection.send(data)
-        .then(() => null)
-        .catch(onError)
     },
     close: () => {
       if (connection != null) {
