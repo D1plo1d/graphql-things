@@ -77,8 +77,6 @@ const GraphqlThing = ({
     })
     const socket = createSocket(null, message.protocol)
 
-    await eventTrigger(socket, 'open')
-
     socketServer.emit('connection', socket)
   }
 

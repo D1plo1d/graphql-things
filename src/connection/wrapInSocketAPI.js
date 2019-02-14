@@ -79,15 +79,7 @@ const wrapInSocketAPI = (params) => {
     socket.readyState !== SOCKET_STATES.CONNECTING
   )
 
-  const onConnection = (nextConnection) => {
-    if (shouldAbortConnection()) {
-      nextConnection.close()
-      socket.close()
-      return
-    }
-
-    connection = nextConnection
-
+  const open = () => {
     // set the state and relay an open event through the socket
     socket.readyState = SOCKET_STATES.OPEN
 
@@ -97,6 +89,18 @@ const wrapInSocketAPI = (params) => {
     }
 
     socket.emit('open')
+  }
+
+  const onConnection = (nextConnection) => {
+    if (shouldAbortConnection()) {
+      nextConnection.close()
+      socket.close()
+      return
+    }
+
+    connection = nextConnection
+
+    open()
 
     // relay connection events through the socket API
     connection.on('data', (data) => {
@@ -118,6 +122,8 @@ const wrapInSocketAPI = (params) => {
    * mimic the websocket API
    */
   const socketImpl = (url, protocol) => {
+    socket.protocol = protocol
+
     const connectionPromise = (async () => {
       const {
         sessionID = (await randomBytes(32)).toString('hex'),
@@ -125,6 +131,9 @@ const wrapInSocketAPI = (params) => {
       } = params
 
       socket.sessionID = sessionID
+
+      // Make sure to return the socket before starting the connection
+      await new Promise(resolve => setTimeout(resolve, 0))
 
       const nextConnection = await connect({
         connectionPath,
@@ -136,8 +145,6 @@ const wrapInSocketAPI = (params) => {
     })()
 
     connectionPromise.catch(onError)
-
-    socket.protocol = protocol
 
     return socket
   }
