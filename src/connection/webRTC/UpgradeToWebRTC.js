@@ -98,17 +98,21 @@ const UpgradeToWebRTC = ({
     nextConnection.emit('error', error)
   }
 
-  rtcPeer.on('data', dechunkifier((data) => {
-    rxDebug(data)
-    nextConnection.emit('data', data)
-  }))
+  const addListeners = () => {
+    rtcPeer.on('data', dechunkifier((data) => {
+      rxDebug(data)
+      nextConnection.emit('data', data)
+    }))
 
-  rtcPeer.on('error', onError)
+    rtcPeer.on('error', onError)
 
-  rtcPeer.on('close', () => {
-    debug('disconnected')
-    nextConnection.emit('close')
-  })
+    rtcPeer.on('close', () => {
+      debug('disconnected')
+      nextConnection.emit('close')
+    })
+  }
+
+  setTimeout(addListeners, 0)
 
   return nextConnection
 }
