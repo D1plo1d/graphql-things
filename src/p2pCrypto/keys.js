@@ -1,18 +1,22 @@
 import Promise from 'any-promise'
 import hkdf from 'futoin-hkdf'
-import eccrypto from 'eccrypto'
+import Elliptic from 'elliptic'
 import randomBytes from './randomBytes'
 
-export const getPublicKey = privateKey => (
-  eccrypto.getPublic(Buffer.from(privateKey, 'hex')).toString('hex')
-)
+const ec = Elliptic.ec('secp256k1')
+
+export const getPublicKey = (privateKeyHex) => {
+  const key = ec.keyFromPrivate(Buffer.from(privateKeyHex, 'hex'))
+  return Buffer.from(key.getPublic('arr')).toString('hex')
+}
 
 export const createECDHKey = async () => {
-  const privateKey = await randomBytes(32)
-  const publicKey = eccrypto.getPublic(privateKey).toString('hex')
+  const privateKeyBuffer = await randomBytes(32)
+  const privateKey = privateKeyBuffer.toString('hex')
+
   return {
-    privateKey: privateKey.toString('hex'),
-    publicKey,
+    privateKey,
+    publicKey: getPublicKey(privateKey),
   }
 }
 
@@ -43,12 +47,14 @@ const kdf = (km) => {
   )
 }
 
-const derive = (privateKey, peerPublicKey) => (
-  eccrypto.derive(
-    Buffer.from(privateKey, 'hex'),
-    Buffer.from(peerPublicKey, 'hex'),
-  )
-)
+const derive = (privateKeyHex, peerPublicKeyHex) => {
+  const privateKey = ec.keyFromPrivate(Buffer.from(privateKeyHex, 'hex'))
+  const publicKey = ec.keyFromPublic(Buffer.from(peerPublicKeyHex, 'hex'))
+
+  const sharedKey = privateKey.derive(publicKey.getPublic())
+
+  return Buffer.from(sharedKey.toArray())
+}
 
 export const createSessionKey = async ({
   isHandshakeInitiator,
