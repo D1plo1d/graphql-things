@@ -10,7 +10,9 @@ An IOT device that did not suffer from these problems would clearly be an improv
 
 GraphQL Things proposes a solution to these problems.
 
-GraphQL Things is a [peer-to-peer](https://en.wikipedia.org/wiki/Peer-to-peer) protocol that connects Internet of Things devices directly to their users. Each GraphQL Thing presents an [end-to-end encrypted](https://en.wikipedia.org/wiki/End-to-end_encryption) GraphQL API that can be accessed over the internet via [NAT Traversal](https://en.wikipedia.org/wiki/NAT_traversal) or offline using [mDNS](https://en.wikipedia.org/wiki/Multicast_DNS) for service discovery.
+GraphQL Things is a [peer-to-peer](https://en.wikipedia.org/wiki/Peer-to-peer) Apollo link that connects users directly to their Internet of Things devices without any cloud or local http servers.
+
+Each GraphQL Thing presents an [end-to-end encrypted](https://en.wikipedia.org/wiki/End-to-end_encryption) GraphQL API that can be accessed on the Distributed Web via [Beaker Browser](https://beakerbrowser.com/)
 
 GraphQL Things do away with the need for centralized cloud server middle men because GraphQL Things IOT devices are their own GraphQL servers:
 
@@ -23,13 +25,13 @@ GraphQL Things do away with the need for centralized cloud server middle men bec
 </p>
 
 ## Features
-* **Decentralized** - GraphQL Things require no centralized servers, no DNS and no Certificate Authorities. Users connect directly to their GraphQL Things with or without the internet.
+* **Decentralized** - GraphQL Things require no centralized servers, no DNS and no Certificate Authorities. Users discover and connect to their GraphQL Things through the P2P network with or without the internet.
 * **End-to-end Encrypted** - GraphQL Things use [Triple Diffie Helman](https://signal.org/docs/specifications/x3dh/) and 256-bit [Eliptical Curve Cryptography](https://www.globalsign.com/en/blog/elliptic-curve-cryptography/) to establish authenticated end-to-end encrypted connections.
 * **Secure Onboarding** - "Invite" QR Codes containing cryptographic key data allow users to to establish an initial connection with known, trusted keys even when their internet is down.
 * **Data Ownership** - Since data is only ever accessed directly from the GraphQL Thing IOT device using public keys the user has authorized, users stay in full control of their data.
 * **NAT-traversing** - GraphQL Things use [WebRTC and ICE](https://www.youtube.com/watch?v=7qAQuC9muf8) to establish connections directly from the device to any authorized client.
 * **Beaker Browser Ready** - GraphQL Things are built on the [Dat P2P protocol](https://datproject.org/) so any GraphQL Thing can be queried directly from the Dat-based [Beaker Browser](https://beakerbrowser.com/).
-* **Offline Discoverable** - On local networks users can seemlessly continue to use their GraphQL Things and connect to new GraphQL Things using Dat's built-in mDNS discovery.
+
 
 ## Security Disclaimer
 
