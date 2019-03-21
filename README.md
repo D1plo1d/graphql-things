@@ -71,17 +71,11 @@ import { GraphQLThing, getInviteCode } from 'graphql-things'
 import * as qrcode from 'qrcode-terminal'
 
 import schema from './schema'
-import keys from '../keys/keys.json'
 
-const {
-  clientKeys,
-  hostKeys: identityKeys,
-} = keys
-
-const inviteCode = getInviteCode({
-  identityKeys,
-  inviteKeys: clientKeys,
-})
+const hostKeys = {
+  "privateKey": "936c209759e5a14c24b92e0d14b0d790a361d0aa2da92b0e14b212d9b2fd9a07",
+  "publicKey": "047add829ce23c7ffce322afbe9a4007e03e864ce07711f5194bca20aa1ac55325c95517364fe1149bd84989c5961c74ba17d70bc1890dc5bda39367d8e2cb8e40",
+}
 
 // instantiate the dat node
 const DAT_URL = 'dat://c53b89f627481422ad71a646c547105de1509b4b4552bb18c71e4be200b7ef4c/'
@@ -90,6 +84,8 @@ const dat = Dat.createNode({
 })
 const datPeers = dat.getPeers(DAT_URL)
 
+const inviteKeys = []
+
 /*
 * return true to allow the connection if an authorized user can be found with
 * the identity public key.
@@ -97,12 +93,10 @@ const datPeers = dat.getPeers(DAT_URL)
 const authenticate = ({ peerIdentityPublicKey }) => {
   console.log(`\n\nNew connection from ${peerIdentityPublicKey}`)
   /*
-   * IMPORTANT: REPLACE THIS CODE!
-   *
    * Replace this return with your authentication logic to prevent unauthorized
    * access.
    */
-  return true
+  return inviteKeys.includes(peerIdentityPublicKey)
 }
 
 const graphqlThing = GraphQLThing({
@@ -130,14 +124,25 @@ const options = {
 
 SubscriptionServer.create(options, graphqlThing)
 
-qrcode.generate(inviteCode, { small: true }, (qr) => {
-  console.log(
-    `Listening for Connections\n\nPublic Key: ${identityKeys.publicKey}\n\n`
-    + 'Invite Code QR Code:\n\n'
-    + qr
-    + '\n\n'
-    + 'Invite Code String:\n\n'
-    + inviteCode,
-  )
+// create a new cryptographic invite code
+createInvite({
+  identityKeys,
+}).then((invite) => {
+  // Store the invite key so it can be checked in authentication
+  inviteKeys.push(invite.keys.publicKey)
+  /*
+   * Display the invite code as a QR Code in the command line so the user can
+   * copy it into their client and securely connect
+   */
+  qrcode.generate(invite.code, { small: true }, (qr) => {
+    console.log(
+      `Listening for Connections\n\nPublic Key: ${identityKeys.publicKey}\n\n`
+      + 'Invite Code QR Code:\n\n'
+      + qr
+      + '\n\n'
+      + 'Invite Code String:\n\n'
+      + invite.code,
+    )
+  })
 })
 ```
