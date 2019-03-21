@@ -45,12 +45,18 @@ GraphQL Things' cryptography has not been security audited and should not be use
 import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 
-import { ThingLink } from 'graphql-things'
+import { ThingLink, parseInviteCode } from 'graphql-things'
+
+/*
+ * client identity keys can be parsed from invite codes created on the
+ * server (see "Apollo Server" example below).
+ */
+const { identityKeys } = parseInviteCode(YOUR_INVITE_CODE)
 
 const client = new ApolloClient({
   link: ThingLink({
-    identityKeys: YOUR_USER_IDENTITY_KEYS,
-    peerIdentityPublicKey: YOUR_IOT_THING_PUBLIC_KEY,
+    identityKeys,
+    peerIdentityPublicKey: YOUR_HOST_ECDH_PUBLIC_KEY,
     options: { reconnect: true },
   }),
   cache: new InMemoryCache(),
@@ -68,23 +74,18 @@ import wrtc from 'wrtc'
 import { execute, subscribe } from 'graphql'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 
-import { GraphQLThing, getInviteCode } from 'graphql-things'
+import { GraphQLThing, getInviteCode, createECDHKey } from 'graphql-things'
 
 import * as qrcode from 'qrcode-terminal'
 
 import schema from './schema'
 
-const hostKeys = {
-  "privateKey": "936c209759e5a14c24b92e0d14b0d790a361d0aa2da92b0e14b212d9b2fd9a07",
-  "publicKey": "047add829ce23c7ffce322afbe9a4007e03e864ce07711f5194bca20aa1ac55325c95517364fe1149bd84989c5961c74ba17d70bc1890dc5bda39367d8e2cb8e40",
-}
-
 // instantiate the dat node
-const DAT_URL = 'dat://c53b89f627481422ad71a646c547105de1509b4b4552bb18c71e4be200b7ef4c/'
 const dat = Dat.createNode({
   path: './.dat-data',
 })
-const datPeers = dat.getPeers(DAT_URL)
+
+const datPeers = dat.getPeers(YOUR_DAT_URL)
 
 const inviteKeys = []
 
@@ -100,6 +101,16 @@ const authenticate = ({ peerIdentityPublicKey }) => {
    */
   return inviteKeys.includes(peerIdentityPublicKey)
 }
+
+/*
+ * In production you should create and save new host identityKeys on first
+ * startup with:
+ *
+ * `fs.writeFileSync(PATH_TO_YOUR_KEYS_FILE, await createECDHKey())`
+ *
+ * Subsequent host restarts should load the identityKeys from your keys file.
+ */
+const identityKeys = fs.readFileSync(PATH_TO_YOUR_KEYS_FILE, 'utf8')
 
 const graphqlThing = GraphQLThing({
   datPeers,
