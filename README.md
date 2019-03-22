@@ -14,9 +14,9 @@ With P2P communication there comes an additional challenge - how do we securely 
 
 It is impractical to expect each consumer to buy a domain name to get an SSL Cert for their household IOT device.
 
-Instead of Certificate Authorities Graphql Things use a unique cryptographic QR code which you scan in Beaker Browser to immediately establish a secure GraphQL connection to the device. This has the added advantage that unlike local http servers, you will never have to type in a device ip address because graphql-things uses the P2P network and public/private key cryptography to automatically discover and securely connect to your device.
+Instead of Certificate Authorities GraphQL Things use a unique cryptographic QR code which you scan in Beaker Browser to immediately establish a secure GraphQL connection to the device. This has the added advantage that unlike local http servers, you will never have to type in a device ip address because Graphql Things uses the P2P network and public/private key cryptography to automatically discover and securely connect to your device.
 
-With graphql-things you, the consumer maintain complete ownership of your data since your data is never stored on a cloud server and all your communication to your device is end-to-end encrypted and you can always connect to your device, even when the internet is down.
+With GraphQL Things you, the consumer maintain complete ownership of your data since your data is never stored on a cloud server and all your communication to your device is end-to-end encrypted and you can always connect to your device, even when the internet is down.
 
 <p align="center">
   <img
