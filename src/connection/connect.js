@@ -3,16 +3,22 @@ const connect = ({
   protocol,
   sessionID,
   shouldAbortConnection,
+  timeout,
 }) => {
+  const timeoutAt = timeout == null ? null : Date.now() + timeout
+
   const connectionReducer = (currentConnectionPromise, nextConnectionFn) => (
     currentConnectionPromise.then(async (currentConnection) => {
       const nextConnection = await nextConnectionFn({
         currentConnection,
         protocol,
         sessionID,
+        timeoutAt,
       })
 
-      if (shouldAbortConnection()) {
+      const timedout = timeout != null && Date.now() > timeoutAt
+
+      if (shouldAbortConnection() || timedout) {
         nextConnection.close()
         // if the socket has been closed then stop the connection process
         throw new Error('aborting the connection')

@@ -46,6 +46,7 @@ const handshakeResMessage = ({
   protocol,
   sessionID,
 }) => ({
+  id: 1,
   type: HANDSHAKE_RES,
   protocol,
   sessionID,

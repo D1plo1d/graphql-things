@@ -19,7 +19,7 @@ const createDatPeerNetwork = ({
     onError,
     responseListeners: {
     },
-    keyFor: (sessionID) => (
+    keyFor: sessionID => (
       JSON.stringify(sessionID)
     ),
     listenFor: (sessionID, cb) => {

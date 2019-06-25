@@ -63,7 +63,11 @@ const UpgradeToWebRTC = ({
   const sdp = await eventTrigger(rtcPeer, 'signal')
 
   debug('sending upgrade message')
-  await currentConnection.send(webRTCUpgradeMessage({ protocol, sdp }))
+  await currentConnection.send(webRTCUpgradeMessage({
+    id: initiator ? 2 : 3,
+    protocol,
+    sdp,
+  }))
 
   if (initiator) {
     /*
@@ -76,6 +80,9 @@ const UpgradeToWebRTC = ({
   debug('connecting...')
   await eventTrigger(rtcPeer, 'connect')
   debug('connected')
+
+  // clean up the old DAT-based connection
+  currentConnection.close()
 
   /*
    * Wrap the webRTC peer in a Connection object

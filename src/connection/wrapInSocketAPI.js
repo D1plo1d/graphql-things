@@ -38,7 +38,7 @@ const wrapInSocketAPI = (params) => {
       error,
     )
 
-    if (socket.onerror != null) {
+    if (hasOnError) {
       socket.onerror(new Error(error))
     } else {
       socket.emit('error', new Error(error))
@@ -128,6 +128,7 @@ const wrapInSocketAPI = (params) => {
       const {
         sessionID = (await randomBytes(32)).toString('hex'),
         connectionPath,
+        timeout,
       } = params
 
       socket.sessionID = sessionID
@@ -140,6 +141,7 @@ const wrapInSocketAPI = (params) => {
         sessionID,
         protocol,
         shouldAbortConnection,
+        timeout,
       })
       onConnection(nextConnection)
     })()

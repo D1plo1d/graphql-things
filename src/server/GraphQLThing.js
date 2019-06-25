@@ -16,6 +16,7 @@ const GraphqlThing = ({
   identityKeys,
   // authenticate({ peerIdentityPublicKey }) => boolean
   authenticate,
+  timeout = 4000,
   wrtc,
 }) => {
   if (typeof authenticate !== 'function') {
@@ -74,6 +75,7 @@ const GraphqlThing = ({
     const createSocket = wrapInSocketAPI({
       connectionPath,
       sessionID,
+      timeout,
     })
     const socket = createSocket(null, message.protocol)
 

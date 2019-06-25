@@ -11,6 +11,7 @@ const browserDatPeers = (
 const ThingLink = ({
   identityKeys,
   peerIdentityPublicKey,
+  timeout = 4000,
   datPeers = browserDatPeers,
   options,
 }) => {
@@ -27,6 +28,7 @@ const ThingLink = ({
 
   const socketImpl = wrapInSocketAPI({
     connectionPath,
+    timeout,
   })
 
   const thingLink = new WebSocketLink({

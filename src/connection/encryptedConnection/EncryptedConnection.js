@@ -39,6 +39,8 @@ const EncryptedConnection = ({
 
   const handshake = initiator ? initiatorHandshake : receiverHandshake
 
+  let lastMessageID = -1
+
   const {
     sessionKey,
   } = await handshake({
@@ -70,8 +72,17 @@ const EncryptedConnection = ({
   }
 
   const onData = async ({ encryptedData }) => {
-    const data = decrypt(encryptedData, { sessionKey })
-    nextConnection.emit('data', data)
+    let data
+    try {
+      data = decrypt(encryptedData, { sessionKey })
+    } catch {
+      // invalid encrypted data could be because of a third party. Discard it.
+      return
+    }
+    if (data.id > lastMessageID) {
+      lastMessageID = data.id
+      nextConnection.emit('data', data)
+    }
   }
 
   currentConnection.on('data', (message) => {
