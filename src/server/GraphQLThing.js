@@ -16,6 +16,7 @@ const GraphqlThing = ({
   // authenticate({ peerIdentityPublicKey }) => boolean
   authenticate,
   timeout = 7000,
+  recycleSessionIDsAfter = 20000,
   wrtc,
 }) => {
   if (typeof authenticate !== 'function') {
@@ -24,7 +25,7 @@ const GraphqlThing = ({
   // const {
   //   connectionPath = ConnectionPath(params),
   // } = params
-  const sessionIDs = []
+  const sessionIDs = {}
 
   const datPeerNetwork = createDatPeerNetwork({
     datPeers,
@@ -55,10 +56,18 @@ const GraphqlThing = ({
       return
     }
 
+    if (sessionIDs[sessionID]) return
+
     debug(`new connection from ${peerIdentityPublicKey}`)
 
-    if (sessionIDs.includes(sessionID)) return
     if (authenticate({ peerIdentityPublicKey }) === false) return
+
+    sessionIDs[sessionID] = true
+    if (timeout) {
+      setTimeout(() => {
+        delete sessionIDs[sessionID]
+      }, recycleSessionIDsAfter)
+    }
 
     const connectionPath = ConnectionPath({
       identityKeys,

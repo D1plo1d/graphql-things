@@ -8,6 +8,7 @@ const browserDatPeers = (
   typeof experimental === 'undefined' ? null : experimental.datPeers
 )
 
+
 const ThingLink = ({
   identityKeys,
   peerIdentityPublicKey,
