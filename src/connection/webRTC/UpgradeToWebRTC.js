@@ -63,7 +63,7 @@ const UpgradeToWebRTC = ({
   const sdp = await eventTrigger(rtcPeer, 'signal')
 
   debug('sending upgrade message')
-  await currentConnection.send(webRTCUpgradeMessage({
+  currentConnection.send(webRTCUpgradeMessage({
     id: initiator ? 2 : 3,
     protocol,
     sdp,

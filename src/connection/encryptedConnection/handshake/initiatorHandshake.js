@@ -26,7 +26,7 @@ const initiatorHandshake = async ({
     sessionID,
   })
 
-  await currentConnection.send(request)
+  currentConnection.send(request)
 
   /*
    * wait for a vaild handshake response

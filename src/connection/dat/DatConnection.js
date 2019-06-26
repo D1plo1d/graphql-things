@@ -45,14 +45,23 @@ const DatConnection = ({
     nextConnection.emit('close')
   }
 
+  const error = (e) => {
+    nextConnection.emit('error', e)
+    close()
+  }
+
   const sendCurrentMessage = () => {
-    if (timeoutAt != null && Date.now() > timeoutAt) {
-      nextConnection.emit('error', new Error('Connection timed out'))
-      close()
-      return
+    try {
+      if (timeoutAt != null && Date.now() > timeoutAt) {
+        error(new Error('Connection timed out'))
+        return
+      }
+
+      txDebug(currentMessage)
+      datPeer.send(currentMessage)
+    } catch (e) {
+      error(e)
     }
-    txDebug(currentMessage)
-    datPeer.send(currentMessage)
   }
 
   // events: data, error
@@ -66,8 +75,6 @@ const DatConnection = ({
 
       sendCurrentMessage()
       resendInterval = setInterval(sendCurrentMessage, RESEND_EVERY_MS)
-
-      return Promise.resolve()
     },
     close,
   })

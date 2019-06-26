@@ -36,7 +36,7 @@ const receiverHandshake = async ({
     ephemeralKeys,
   })
 
-  await currentConnection.send(response)
+  currentConnection.send(response)
 
   return {
     sessionKey,
