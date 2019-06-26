@@ -39,9 +39,9 @@ const wrapInSocketAPI = (params) => {
     )
 
     if (hasOnError) {
-      socket.onerror(new Error(error))
+      socket.onerror(error)
     } else {
-      socket.emit('error', new Error(error))
+      socket.emit('error', error)
     }
   }
 

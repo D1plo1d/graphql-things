@@ -29,6 +29,10 @@ const createClient = (inviteCode) => {
       identityKeys,
       peerIdentityPublicKey,
       options: { reconnect: false },
+      onError: (error) => {
+        // eslint-disable-next-line no-console
+        console.log(error)
+      },
     }),
     cache: new InMemoryCache(),
   })

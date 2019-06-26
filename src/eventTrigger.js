@@ -14,7 +14,7 @@ const eventTrigger = (eventEmitter, eventName, {
     const errorListener = (error) => {
       eventEmitter[REMOVE]('error', errorListener)
       eventEmitter[REMOVE](eventName, eventListener)
-      reject(new Error(error))
+      reject(error)
     }
 
     eventListener = async (result) => {

@@ -11,9 +11,10 @@ const browserDatPeers = (
 const ThingLink = ({
   identityKeys,
   peerIdentityPublicKey,
-  timeout = 4000,
+  timeout = 7000,
   datPeers = browserDatPeers,
   options,
+  onError,
 }) => {
   // TODO: getDatIDFromPublicKey if it differs
   const datPeerID = peerIdentityPublicKey
@@ -36,6 +37,8 @@ const ThingLink = ({
     options,
     webSocketImpl: socketImpl,
   })
+
+  thingLink.subscriptionClient.onError(onError)
 
   /*
    * Override the default 1 second connection timeout with something

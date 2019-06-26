@@ -1,7 +1,6 @@
 import EventEmitter from 'eventemitter3'
 import Debug from 'debug'
 
-import eventTrigger from '../eventTrigger'
 import ConnectionPath from '../connection/ConnectionPath'
 import createDatPeerNetwork from '../connection/dat/createDatPeerNetwork'
 import wrapInSocketAPI, { SOCKET_STATES } from '../connection/wrapInSocketAPI'
@@ -16,7 +15,7 @@ const GraphqlThing = ({
   identityKeys,
   // authenticate({ peerIdentityPublicKey }) => boolean
   authenticate,
-  timeout = 4000,
+  timeout = 7000,
   wrtc,
 }) => {
   if (typeof authenticate !== 'function') {
