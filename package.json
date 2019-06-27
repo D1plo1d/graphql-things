@@ -9,7 +9,8 @@
   "private": false,
   "files": [
     "src/*",
-    "src/**/*"
+    "src/**/*",
+    "client.js"
   ],
   "scripts": {
     "bootstrap": "yarn && yarn build && yarn build-example && yarn create-example-keys",
