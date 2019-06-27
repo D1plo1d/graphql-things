@@ -1,12 +1,15 @@
+import { SIGNAL } from '../constants'
+
 const webRTCUpgradeMessage = ({
-  id,
   sdp,
-  protocol,
 }) => ({
-  id,
-  connection: 'upgrade',
-  upgrade: `webrtc-chunk-${protocol}`,
+  type: SIGNAL,
   sdp,
 })
+
+export const isValidSignal = data => (
+  data.type === SIGNAL
+  && typeof data.sdp === 'object'
+)
 
 export default webRTCUpgradeMessage

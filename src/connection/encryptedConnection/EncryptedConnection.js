@@ -39,7 +39,8 @@ const EncryptedConnection = ({
 
   const handshake = initiator ? initiatorHandshake : receiverHandshake
 
-  let lastMessageID = -1
+  let lastTXMessageID = -1
+  const receivedMessageIDs = []
 
   const {
     sessionKey,
@@ -55,9 +56,19 @@ const EncryptedConnection = ({
   const nextConnection = Connection({
     sessionID,
     send: async (data) => {
-      const encryptedData = await encrypt(data, { sessionKey })
+      lastTXMessageID += 1
+
+      /*
+       * due to the asynchronous nature of encryption message IDs may be sent
+       * out of order.
+       */
+      const encryptedData = await encrypt({
+        id: lastTXMessageID,
+        ...data,
+      }, { sessionKey })
 
       currentConnection.send({
+        peerIdentityPublicKey,
         sessionID,
         encryptedData,
       })
@@ -79,8 +90,8 @@ const EncryptedConnection = ({
       // invalid encrypted data could be because of a third party. Discard it.
       return
     }
-    if (data.id > lastMessageID) {
-      lastMessageID = data.id
+    if (receivedMessageIDs[data.id] !== true) {
+      receivedMessageIDs[data.id] = true
       nextConnection.emit('data', data)
     }
   }
@@ -93,6 +104,11 @@ const EncryptedConnection = ({
 
   currentConnection.on('close', () => {
     nextConnection.emit('close')
+  })
+
+  nextConnection.on('close', () => {
+    // clean up
+    setTimeout(() => nextConnection.removeAllListeners(), 0)
   })
 
   return nextConnection

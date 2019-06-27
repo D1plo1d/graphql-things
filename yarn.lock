@@ -1010,7 +1010,7 @@ async-each@^1.0.0:
   resolved "https://registry.yarnpkg.com/async-each/-/async-each-1.0.1.tgz#19d386a1d9edc6e7c1c85d388aedbcc56d33602d"
   integrity sha1-GdOGodntxufByF04iu28xW0zYC0=
 
-async-limiter@~1.0.0:
+async-limiter@^1.0.0, async-limiter@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.0.tgz#78faed8c3d074ab81f22b4e985d79e8738f720f8"
   integrity sha512-jp/uFnooOiO+L211eZOoSyzpOITMXx1rBITauYykG3BRYPu8h0UcxsPNB04RR5vo4Tyz3+ay17tR6JVf9qzYWg==
@@ -5364,10 +5364,10 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
   integrity sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
 
-simple-peer@^9.2.0:
-  version "9.2.0"
-  resolved "https://registry.yarnpkg.com/simple-peer/-/simple-peer-9.2.0.tgz#022105756b7c4489fe9809585ba6a3df8e856599"
-  integrity sha512-BaNhpcMBEI7GjZo+6uKSJgihtpvcopzfhSbzyhSi67d8Ab9Rp5KsXQ8pB2Yx6km46PgjNUga+2fYnHnIPLl5gg==
+simple-peer@^9.4.0:
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/simple-peer/-/simple-peer-9.4.0.tgz#eb82ef1181e10ec0c014a94953e2eb278f3d9025"
+  integrity sha512-8qF32uq6SSSVXoBq9g31uGqZYupwRD3Ta/QK9fV04U/IbnIS6mictLb8/kjFyLVa3JrD7QYyKrw3nvJJ+lNFDw==
   dependencies:
     debug "^4.0.1"
     get-browser-rtc "^1.0.0"
@@ -6071,6 +6071,13 @@ ws@^6.1.0:
   integrity sha512-rfUqzvz0WxmSXtJpPMX2EeASXabOrSMk1ruMOV3JBTBjo4ac2lDjGGsbQSyxj8Odhw5fBib8ZKEjDNvgouNKYw==
   dependencies:
     async-limiter "~1.0.0"
+
+ws@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.0.1.tgz#1a04e86cc3a57c03783f4910fdb090cf31b8e165"
+  integrity sha512-ILHfMbuqLJvnSgYXLgy4kMntroJpe8hT41dOVWM8bxRuw6TK4mgMp9VJUNsZTEc5Bh+Mbs0DJT4M0N+wBG9l9A==
+  dependencies:
+    async-limiter "^1.0.0"
 
 xml-name-validator@^3.0.0:
   version "3.0.0"

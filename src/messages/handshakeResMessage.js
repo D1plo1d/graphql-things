@@ -3,7 +3,6 @@ import { ENCRYPTION_ALGORITHM } from '../p2pCrypto/encryption'
 import {
   HANDSHAKE_RES,
   HANDSHAKE_ALGORITHM,
-  PUBLIC_KEY_LENGTH,
 } from '../constants'
 
 export const validateHandshakeRes = (handshakeReq) => {
@@ -43,13 +42,14 @@ export const validateHandshakeRes = (handshakeReq) => {
 const handshakeResMessage = ({
   identityKeys,
   ephemeralKeys,
+  peerIdentityPublicKey,
   protocol,
   sessionID,
 }) => ({
-  id: 1,
   type: HANDSHAKE_RES,
   protocol,
   sessionID,
+  peerIdentityPublicKey,
   handshakeAlgorithm: HANDSHAKE_ALGORITHM,
   encryptionAlgorithm: ENCRYPTION_ALGORITHM,
   identityPublicKey: identityKeys.publicKey,

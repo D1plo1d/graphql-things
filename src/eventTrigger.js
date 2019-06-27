@@ -11,10 +11,14 @@ const eventTrigger = (eventEmitter, eventName, {
 
     let eventListener
 
-    const errorListener = (error) => {
+    const errorListener = (event) => {
+      // WebSockets use event.error instead of passing the error itself
+      const error = event.error || event
+
       eventEmitter[REMOVE]('error', errorListener)
       eventEmitter[REMOVE](eventName, eventListener)
-      reject(error)
+
+      reject(error instanceof Error ? error : new Error(error))
     }
 
     eventListener = async (result) => {

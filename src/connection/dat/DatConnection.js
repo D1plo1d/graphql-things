@@ -1,7 +1,6 @@
 import Debug from 'debug'
 
 import Connection from '../Connection'
-import createDatPeerNetwork from './createDatPeerNetwork'
 
 const rxDebug = Debug('graphql-things:dat:rx')
 const txDebug = Debug('graphql-things:dat:tx')
@@ -9,22 +8,13 @@ const txDebug = Debug('graphql-things:dat:tx')
 const RESEND_EVERY_MS = 1000
 
 const DatConnection = ({
-  datPeer: datPeerParam,
-  // datPeerID,
-  datPeers,
-  datPeerNetwork: externalDatNetwork,
+  datPeer,
+  datPeerNetwork,
 } = {}) => async ({
   sessionID,
   timeoutAt,
 }) => {
-  const datPeer = datPeerParam || { send: data => datPeers.broadcast(data) }
-
-  /*
-   * creating a network for the data connection which will be closed with it if
-   * a network isn't passed in with the params
-   */
-  const network = externalDatNetwork || createDatPeerNetwork({ datPeers })
-  await network.connect()
+  await datPeerNetwork.connect()
 
   let resendInterval = null
   let currentMessage = null
@@ -36,10 +26,10 @@ const DatConnection = ({
 
   const close = () => {
     stopResendingPreviousMessage()
-    network.removeListener(sessionID)
+    datPeerNetwork.removeListener(sessionID)
 
-    if (externalDatNetwork == null) {
-      network.close()
+    if (datPeerNetwork.persistent === false) {
+      datPeerNetwork.close()
     }
 
     nextConnection.emit('close')
@@ -58,7 +48,11 @@ const DatConnection = ({
       }
 
       txDebug(currentMessage)
-      datPeer.send(currentMessage)
+      if (datPeer != null) {
+        datPeer.send(currentMessage)
+      } else {
+        datPeerNetwork.send(currentMessage)
+      }
     } catch (e) {
       error(e)
     }
@@ -79,9 +73,14 @@ const DatConnection = ({
     close,
   })
 
-  network.listenFor(sessionID, ({ message }) => {
+  datPeerNetwork.listenFor(sessionID, ({ message }) => {
     rxDebug(message)
     nextConnection.emit('data', message)
+  })
+
+  nextConnection.on('close', () => {
+    // clean up
+    setTimeout(() => nextConnection.removeAllListeners(), 0)
   })
 
   return nextConnection

@@ -42,7 +42,6 @@ const handshakeReqMessage = ({
   protocol,
   sessionID,
 }) => ({
-  id: 0,
   type: HANDSHAKE_REQ,
   protocol,
   sessionID,

@@ -5,29 +5,11 @@ import Connection from '../Connection'
 
 import eventTrigger from '../../eventTrigger'
 import { chunkifier, dechunkifier } from './chunk'
-import webRTCUpgradeMessage from '../../messages/webRTCUpgradeMessage'
+import webRTCUpgradeMessage, { isValidSignal } from '../../messages/webRTCUpgradeMessage'
 
 const debug = Debug('graphql-things:webrtc')
 const rxDebug = Debug('graphql-things:webrtc:rx')
 const txDebug = Debug('graphql-things:webrtc:tx')
-
-const setPeerSDP = ({ rtcPeer, peerSDP }) => {
-  if (typeof peerSDP !== 'object') {
-    throw new Error('invalid SDP')
-  }
-  rtcPeer.signal(peerSDP)
-}
-
-const sdpArrivalTrigger = async (currentConnection) => {
-  debug('awaiting SDP')
-  const message = await eventTrigger(currentConnection, 'data', {
-    filter: data => (
-      data.connection === 'upgrade'
-      && data.sdp != null
-    ),
-  })
-  return message.sdp
-}
 
 /*
  * upgrades the current connection to a webRTC connection
@@ -38,51 +20,63 @@ const UpgradeToWebRTC = ({
 } = {}) => async ({
   currentConnection,
   protocol,
+  timeoutAt,
 }) => {
   const rtcPeer = new Peer({
     initiator,
     wrtc,
   })
 
-  rtcPeer.on('iceStateChange', (state) => {
+  const onIceChange = (state) => {
     if (state === 'disconnected') {
       debug('iceState changed to disconnected')
       rtcPeer.destroy()
     }
-  })
-
-  if (!initiator) {
-    const peerSDP = await sdpArrivalTrigger(currentConnection)
-    setPeerSDP({ rtcPeer, peerSDP })
   }
 
-  /*
-   * Await our SDP (WebRTC contact info) and when it's ready send it to the
-   * remote peer.
-   */
-  const sdp = await eventTrigger(rtcPeer, 'signal')
-
-  debug('sending upgrade message')
-  currentConnection.send(webRTCUpgradeMessage({
-    id: initiator ? 2 : 3,
-    protocol,
-    sdp,
-  }))
-
-  if (initiator) {
-    /*
-     * if we initiated the webRTC upgrade wait until a SDP is sent back
-     */
-    const peerSDP = await sdpArrivalTrigger(currentConnection)
-    setPeerSDP({ rtcPeer, peerSDP })
+  const sendSignalToPeer = (sdp) => {
+    currentConnection.send(webRTCUpgradeMessage({
+      protocol,
+      sdp,
+    }))
   }
+
+  const receiveSignalFromPeer = (message) => {
+    if (isValidSignal(message)) {
+      rtcPeer.signal(message.sdp)
+    }
+  }
+
+  debug('exchanging trickled ICE signals...')
+
+  rtcPeer.on('iceStateChange', onIceChange)
+  rtcPeer.on('signal', sendSignalToPeer)
+  currentConnection.on('data', receiveSignalFromPeer)
 
   debug('connecting...')
-  await eventTrigger(rtcPeer, 'connect')
-  debug('connected')
 
-  // clean up the old DAT-based connection
-  currentConnection.close()
+  let timeoutReference
+  const timeoutMS = Math.max(timeoutAt - Date.now(), 0)
+
+  await new Promise((resolve, reject) => {
+    timeoutReference = setTimeout(() => {
+      rtcPeer.removeListener('iceStateChange', onIceChange)
+      rtcPeer.removeListener('signal', sendSignalToPeer)
+      currentConnection.removeListener('data', receiveSignalFromPeer)
+
+      reject(new Error('connection timed out'))
+    }, timeoutMS)
+
+    eventTrigger(rtcPeer, 'connect')
+      .then(resolve)
+      .catch(reject)
+  }).finally(() => {
+    clearTimeout(timeoutReference)
+    // clean up the old DAT-based connection
+    currentConnection.close()
+  })
+
+  debug('connected')
 
   /*
    * Wrap the webRTC peer in a Connection object

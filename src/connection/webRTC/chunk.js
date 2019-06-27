@@ -1,3 +1,5 @@
+import msgpack from 'msgpack-lite'
+
 const splitSlice = (str, len) => {
   const ret = []
   for (let offset = 0, strLen = str.length; offset < strLen; offset += len) {
@@ -21,27 +23,19 @@ const MAX_ID = (2 ** ID_BYTES) - 1
 const CHUNK_BYTES = 65536
 const CHUNK_PAYLOAD_BYTES = CHUNK_BYTES - HEADER_BYTES
 
-const splitMessageIntoChunks = ({ id, message }) => {
-  if (typeof message !== 'string') {
-    throw new Error('message must be a string')
-  }
-
-  const paddedId = id.toString().padStart(ID_BYTES, '0')
-
-  if (message.length < CHUNK_PAYLOAD_BYTES) {
+const splitMessageIntoChunks = ({ id, buf }) => {
+  if (buf.length < CHUNK_PAYLOAD_BYTES) {
     // small messages are not chunked
     return [
-      `${PREFIXES.SMALL_UNCHUNKED_MESSAGE}${paddedId}:${message}`,
+      msgpack.encode([PREFIXES.SMALL_UNCHUNKED_MESSAGE, id, buf]),
     ]
   }
 
-  const chunks = splitSlice(message, CHUNK_PAYLOAD_BYTES).map(chunkPayload => (
-    `${PREFIXES.CHUNKED_MESSAGE}${paddedId}:${chunkPayload}`
+  const chunks = splitSlice(buf, CHUNK_PAYLOAD_BYTES).map(chunkPayload => (
+    msgpack.encode([PREFIXES.CHUNKED_MESSAGE, id, chunkPayload])
   ))
 
-  const header = (
-    `${PREFIXES.HEADER}${paddedId}:${chunks.length}`
-  )
+  const header = msgpack.encode([PREFIXES.HEADER, id, chunks.length])
 
   chunks.unshift(header)
 
@@ -72,13 +66,17 @@ export const chunkifier = (channel, callback) => {
   channel.onbufferedamountlow = sendNextChunks
 
   return message => setImmediate(() => {
+    const buf = msgpack.encode(message)
     const previouslyEmptyChunks = chunks.length === 0
+
     chunks = chunks.concat(splitMessageIntoChunks({
       id: nextID,
-      message,
+      buf,
     }))
+
     nextID += 1
     if (nextID > MAX_ID) nextID = 0
+
     if (
       previouslyEmptyChunks
       && (channel.bufferedAmount <= bufferedAmountLowThreshold)
@@ -95,19 +93,17 @@ export const dechunkifier = (callback) => {
   const incommingMessages = {}
 
   return (data) => {
-    const chunk = data.toString()
-    const prefix = chunk[0]
-    const id = chunk.slice(1, ID_BYTES + 1)
-    const payload = chunk.slice(HEADER_BYTES)
+    const [prefix, id, payload] = msgpack.decode(data)
 
     switch (prefix) {
       case PREFIXES.SMALL_UNCHUNKED_MESSAGE: {
-        callback(payload)
+        const message = msgpack.decode(payload)
+        callback(message)
         break
       }
       case PREFIXES.HEADER: {
         incommingMessages[id] = {
-          expectedChunksCount: parseInt(payload, 10),
+          expectedChunksCount: payload,
           chunks: [],
         }
         break
@@ -118,7 +114,8 @@ export const dechunkifier = (callback) => {
         chunks.push(payload)
 
         if (chunks.length >= expectedChunksCount) {
-          callback(chunks.join(''))
+          const message = msgpack.decode(Buffer.concat(chunks))
+          callback(message)
         }
         break
       }

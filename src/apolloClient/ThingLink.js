@@ -1,5 +1,7 @@
 import { WebSocketLink } from 'apollo-link-ws'
 
+import createWebSocket from '../connection/dat/createWebSocket'
+import createDatPeerNetwork from '../connection/dat/createDatPeerNetwork'
 import wrapInSocketAPI from '../connection/wrapInSocketAPI'
 import ConnectionPath from '../connection/ConnectionPath'
 
@@ -8,23 +10,27 @@ const browserDatPeers = (
   typeof experimental === 'undefined' ? null : experimental.datPeers
 )
 
-
 const ThingLink = ({
   identityKeys,
   peerIdentityPublicKey,
   timeout = 7000,
   datPeers = browserDatPeers,
+  websocketURL,
+  ws,
+  wrtc,
   options,
   onError,
 }) => {
-  // TODO: getDatIDFromPublicKey if it differs
-  const datPeerID = peerIdentityPublicKey
+  const datPeerNetwork = createDatPeerNetwork({
+    datPeers,
+    createWebSocket: createWebSocket({ identityKeys, ws, websocketURL }),
+  })
 
   const connectionPath = ConnectionPath({
     identityKeys,
     peerIdentityPublicKey,
-    datPeers,
-    datPeerID,
+    datPeerNetwork,
+    wrtc,
     initiator: true,
   })
 

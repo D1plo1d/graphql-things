@@ -1,8 +1,12 @@
 import EventEmitter from 'eventemitter3'
 import Debug from 'debug'
+import ws from 'ws'
 
 import ConnectionPath from '../connection/ConnectionPath'
+
+import createWebSocket from '../connection/dat/createWebSocket'
 import createDatPeerNetwork from '../connection/dat/createDatPeerNetwork'
+
 import wrapInSocketAPI, { SOCKET_STATES } from '../connection/wrapInSocketAPI'
 
 const debug = Debug('graphql-things:connection')
@@ -13,6 +17,7 @@ const debug = Debug('graphql-things:connection')
 const GraphqlThing = ({
   datPeers,
   identityKeys,
+  websocketURL,
   // authenticate({ peerIdentityPublicKey }) => boolean
   authenticate,
   timeout = 7000,
@@ -29,7 +34,10 @@ const GraphqlThing = ({
 
   const datPeerNetwork = createDatPeerNetwork({
     datPeers,
+    persistent: true,
+    createWebSocket: createWebSocket({ identityKeys, ws, websocketURL }),
   })
+
   datPeerNetwork.connect()
     .then(() => {
       debug('listening for dat peers')
@@ -73,7 +81,6 @@ const GraphqlThing = ({
       identityKeys,
       peerIdentityPublicKey,
       initiator: false,
-      datPeers,
       datPeer,
       datPeerNetwork,
       request: message,

@@ -1,5 +1,6 @@
 import Dat from '@beaker/dat-node'
 import wrtc from 'wrtc'
+import Promise from 'bluebird'
 
 import { execute, subscribe } from 'graphql'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
@@ -10,6 +11,8 @@ import * as qrcode from 'qrcode-terminal'
 
 import schema from './schema'
 import keys from '../keys/keys.json'
+
+global.Promise = Promise
 
 const {
   clientKeys,

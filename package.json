@@ -68,6 +68,7 @@
     "elliptic": "^6.4.1",
     "eventemitter3": "^3.1.0",
     "futoin-hkdf": "^1.0.3",
-    "simple-peer": "^9.2.0"
+    "simple-peer": "^9.4.0",
+    "ws": "^7.0.1"
   }
 }

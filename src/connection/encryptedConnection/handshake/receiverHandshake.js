@@ -33,6 +33,7 @@ const receiverHandshake = async ({
     protocol,
     sessionID,
     identityKeys,
+    peerIdentityPublicKey,
     ephemeralKeys,
   })
 
