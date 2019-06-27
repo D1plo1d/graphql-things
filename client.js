@@ -1,23 +1,18 @@
 import {
   createECDHKey,
   getPublicKey,
-} from './p2pCrypto/keys'
+} from './src/p2pCrypto/keys'
 
 import {
   createInvite,
   getInviteCode,
   parseInviteCode,
-} from './inviteCodes'
+} from './src/inviteCodes'
 
 /*
  * Client
  */
-import ThingLink from './apolloClient/ThingLink'
-
-/*
- * Server
- */
-import GraphQLThing from './server/GraphQLThing'
+import ThingLink from './src/apolloClient/ThingLink'
 
 export {
   createECDHKey,
@@ -26,5 +21,4 @@ export {
   getInviteCode,
   parseInviteCode,
   ThingLink,
-  GraphQLThing,
 }

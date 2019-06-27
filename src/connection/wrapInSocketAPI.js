@@ -121,7 +121,7 @@ const wrapInSocketAPI = (params) => {
   /*
    * mimic the websocket API
    */
-  const socketImpl = (url, protocol) => {
+  const socketImpl = function (url, protocol) {
     socket.protocol = protocol
 
     const connectionPromise = (async () => {

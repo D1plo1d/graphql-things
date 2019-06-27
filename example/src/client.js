@@ -8,7 +8,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 
 import QRReader from 'react-qr-reader'
 
-import { ThingLink, parseInviteCode } from 'graphql-things'
+import { ThingLink, parseInviteCode } from 'graphql-things/client'
 
 const createClient = (inviteCode) => {
   let invite
