@@ -18,7 +18,6 @@ const connect = ({
 
       const timedout = timeout != null && Date.now() > timeoutAt
 
-      console.log(shouldAbortConnection(), timedout)
       if (shouldAbortConnection() || timedout) {
         nextConnection.close()
         // if the socket has been closed then stop the connection process

@@ -457,8 +457,18 @@ export class Client {
     return String(++this.nextOperationId);
   }
 
+  private errorAllOperations(error) {
+    Object.entries(this.operations).forEach(([opId, op]) => {
+      op.handler(this.formatErrors(error), null);
+      delete this.operations[opId];
+    })
+  }
+
   private tryReconnect() {
     if (!this.reconnect || this.backoff.attempts >= this.reconnectionAttempts) {
+      this.errorAllOperations({
+        message: 'Connection timed out',
+      })
       return;
     }
 
@@ -506,6 +516,7 @@ export class Client {
       this.connection = null
       this.connecting = false
       this.eventEmitter.emit('error', err);
+      this.errorAllOperations(err)
       return
     }
 

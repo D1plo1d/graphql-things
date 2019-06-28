@@ -10,13 +10,12 @@ import QRReader from 'react-qr-reader'
 
 import { ThingLink, parseInviteCode } from 'graphql-things/client'
 
-console.log(ThingLink)
 const createClient = (inviteCode) => {
   let invite
 
   try {
     invite = parseInviteCode(inviteCode)
-  } catch {
+  } catch (e) {
     return null
   }
 
@@ -30,10 +29,6 @@ const createClient = (inviteCode) => {
       identityKeys,
       peerIdentityPublicKey,
       options: { reconnect: false },
-      onError: (error) => {
-        // eslint-disable-next-line no-console
-        console.log(error)
-      },
     }),
     cache: new InMemoryCache(),
   })
@@ -77,10 +72,7 @@ const App = () => {
               setClient(createClient(inviteMsg))
             }
           }}
-          onError={(error) => {
-            // eslint-disable-next-line no-console
-            console.log('error', error)
-          }}
+          onError={() => {}}
           style={{
             flex: 1,
             width: '30%',
@@ -98,7 +90,7 @@ const App = () => {
             return <div>Connecting to GraphQL Thing...</div>
           }
           if (error) {
-            return <div>{error}</div>
+            return <div>{JSON.stringify(error)}</div>
           }
 
           return (
