@@ -1,6 +1,7 @@
 import Debug from 'debug'
 
 import Connection from '../Connection'
+import ConnectionTimeout from '../ConnectionTimeout'
 
 const rxDebug = Debug('graphql-things:dat:rx')
 const txDebug = Debug('graphql-things:dat:tx')
@@ -43,7 +44,7 @@ const DatConnection = ({
   const sendCurrentMessage = () => {
     try {
       if (timeoutAt != null && Date.now() > timeoutAt) {
-        error(new Error('Connection timed out'))
+        error(new ConnectionTimeout('Connection timed out'))
         return
       }
 

@@ -28,7 +28,10 @@ const createClient = (inviteCode) => {
     link: new ThingLink({
       identityKeys,
       peerIdentityPublicKey,
-      options: { reconnect: false },
+      options: {
+        reconnect: false,
+        // timeout: 7000,
+      },
     }),
     cache: new InMemoryCache(),
   })

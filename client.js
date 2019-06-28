@@ -9,6 +9,8 @@ import {
   parseInviteCode,
 } from './src/inviteCodes'
 
+import { CONNECTION_TIMEOUT } from './src/connection/ConnectionTimeout'
+
 /*
  * Client
  */
@@ -21,4 +23,5 @@ export {
   getInviteCode,
   parseInviteCode,
   ThingLink,
+  CONNECTION_TIMEOUT,
 }

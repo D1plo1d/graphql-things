@@ -12,6 +12,8 @@ import $$observable from 'symbol-observable';
 
 import MessageTypes from 'subscriptions-transport-ws/dist/message-types';
 
+import ConnectionTimeout, { CONNECTION_TIMEOUT } from '../connection/ConnectionTimeout'
+
 export interface Observer<T> {
   next?: (value: T) => void;
   error?: (error: Error) => void;
@@ -516,7 +518,14 @@ export class Client {
       this.connection = null
       this.connecting = false
       this.eventEmitter.emit('error', err);
-      this.errorAllOperations(err)
+      if (err instanceof ConnectionTimeout) {
+        this.errorAllOperations({
+          message: 'Connection timed out',
+          code: CONNECTION_TIMEOUT,
+        })
+      } else {
+        this.errorAllOperations(err)
+      }
       return
     }
 
