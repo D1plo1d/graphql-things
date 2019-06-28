@@ -35,7 +35,11 @@ const GraphqlThing = ({
   const datPeerNetwork = createDatPeerNetwork({
     datPeers,
     persistent: true,
-    createWebSocket: createWebSocket({ identityKeys, ws, websocketURL }),
+    createWebSocket: createWebSocket({
+      identityKeys,
+      webSocketImpl: ws,
+      websocketURL,
+    }),
   })
 
   datPeerNetwork.connect()

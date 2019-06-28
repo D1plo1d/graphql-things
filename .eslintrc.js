@@ -11,7 +11,6 @@ module.exports = {
     'airbnb',
     'plugin:jest/recommended',
   ],
-  parser: 'babel-eslint',
   rules: {
     'semi': [2, 'never'],
     'func-names': ['error', 'never'],

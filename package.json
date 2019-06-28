@@ -13,6 +13,7 @@
     "client.js"
   ],
   "scripts": {
+    "watch": "tsc --target ES2017 -w",
     "bootstrap": "yarn && yarn build && yarn build-example && yarn create-example-keys",
     "create-example-keys": "node -r esm ./scripts/createKeys.js",
     "build-docs": "mmdc -i ./docs/connection-comparison.mmd -o ./docs/dist/connection-comparison.svg -t neutral -b transparent",
@@ -29,12 +30,14 @@
     "eslint-plugin-monorepo": "^0.2.0",
     "eslint-plugin-react": "^7.11.0",
     "esm": "^3.2.25",
-    "graphql": "^14.0.2",
+    "graphql": "^14.4.0",
     "jest": "^23.6.0",
     "mermaid": "^8.0.0",
     "mermaid.cli": "^0.5.1",
     "msgpack-lite": "^0.1.26",
-    "subscriptions-transport-ws": "^0.9.15"
+    "subscriptions-transport-ws": "^0.9.15",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.2"
   },
   "peerDependencies": {
     "graphql": "^14.0.2",
@@ -44,11 +47,13 @@
   "dependencies": {
     "any-promise": "^1.3.0",
     "apollo-link-ws": "^1.0.12",
+    "backo2": "^1.0.2",
     "debug": "^4.1.1",
     "elliptic": "^6.4.1",
     "eventemitter3": "^3.1.0",
     "futoin-hkdf": "^1.0.3",
     "simple-peer": "^9.4.0",
+    "symbol-observable": "^1.2.0",
     "ws": "^7.0.1"
   }
 }

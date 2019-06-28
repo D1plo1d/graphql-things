@@ -10,6 +10,7 @@ import QRReader from 'react-qr-reader'
 
 import { ThingLink, parseInviteCode } from 'graphql-things/client'
 
+console.log(ThingLink)
 const createClient = (inviteCode) => {
   let invite
 
@@ -25,7 +26,7 @@ const createClient = (inviteCode) => {
   } = invite
 
   return new ApolloClient({
-    link: ThingLink({
+    link: new ThingLink({
       identityKeys,
       peerIdentityPublicKey,
       options: { reconnect: false },

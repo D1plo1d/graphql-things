@@ -12,7 +12,7 @@ import {
 /*
  * Client
  */
-import ThingLink from './apolloClient/ThingLink'
+import { ThingLink } from './apolloClient/ThingLink'
 
 /*
  * Server

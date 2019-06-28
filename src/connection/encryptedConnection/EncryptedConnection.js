@@ -86,7 +86,7 @@ const EncryptedConnection = ({
     let data
     try {
       data = decrypt(encryptedData, { sessionKey })
-    } catch {
+    } catch (e) {
       // invalid encrypted data could be because of a third party. Discard it.
       return
     }

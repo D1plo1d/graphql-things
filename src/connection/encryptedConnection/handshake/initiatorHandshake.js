@@ -46,7 +46,7 @@ const initiatorHandshake = async ({
         })
 
         return key
-      } catch {
+      } catch (e) {
         /*
          * invalid messages may be caused by MITM attacks with invalid data so
          * ignore them all.

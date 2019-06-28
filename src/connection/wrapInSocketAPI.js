@@ -30,7 +30,7 @@ const wrapInSocketAPI = (params) => {
     socket.readyState = SOCKET_STATES.CLOSED
 
     if (hasListener === false) {
-      throw new Error(error)
+      throw error instanceof Error ? error : new Error(error)
     }
 
     debug(
@@ -65,7 +65,7 @@ const wrapInSocketAPI = (params) => {
       if (socket.readyState !== SOCKET_STATES.OPEN) {
         throw new Error('Cannot call send on a closed connection')
       }
-      connection.send(data)
+      connection.send(JSON.parse(data))
     },
     close: () => {
       if (connection != null) {
@@ -103,7 +103,8 @@ const wrapInSocketAPI = (params) => {
     open()
 
     // relay connection events through the socket API
-    connection.on('data', (data) => {
+    connection.on('data', (parsedData) => {
+      const data = JSON.stringify(parsedData)
       // console.log('RX SOCKET DATA', data)
       if (socket.onmessage != null) {
         socket.onmessage({ data })

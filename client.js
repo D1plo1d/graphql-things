@@ -12,7 +12,7 @@ import {
 /*
  * Client
  */
-import ThingLink from './src/apolloClient/ThingLink'
+import { ThingLink } from './src/apolloClient/ThingLink'
 
 export {
   createECDHKey,

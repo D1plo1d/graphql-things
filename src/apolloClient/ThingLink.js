@@ -1,68 +1,55 @@
-import { WebSocketLink } from 'apollo-link-ws'
-
-import createWebSocket from '../connection/dat/createWebSocket'
-import createDatPeerNetwork from '../connection/dat/createDatPeerNetwork'
-import wrapInSocketAPI from '../connection/wrapInSocketAPI'
-import ConnectionPath from '../connection/ConnectionPath'
-
-const browserDatPeers = (
-  // eslint-disable-next-line no-undef
-  typeof experimental === 'undefined' ? null : experimental.datPeers
-)
-
-const ThingLink = ({
-  identityKeys,
-  peerIdentityPublicKey,
-  timeout = 7000,
-  datPeers = browserDatPeers,
-  websocketURL,
-  ws,
-  wrtc,
-  options,
-  onError,
-}) => {
-  const datPeerNetwork = createDatPeerNetwork({
-    datPeers,
-    createWebSocket: createWebSocket({ identityKeys, ws, websocketURL }),
-  })
-
-  const connectionPath = ConnectionPath({
-    identityKeys,
-    peerIdentityPublicKey,
-    datPeerNetwork,
-    wrtc,
-    initiator: true,
-  })
-
-  const socketImpl = wrapInSocketAPI({
-    connectionPath,
-    timeout,
-  })
-
-  const thingLink = new WebSocketLink({
-    uri: 'wss://example.com',
-    options,
-    webSocketImpl: socketImpl,
-  })
-
-  thingLink.subscriptionClient.onError(onError)
-
-  /*
-   * Override the default 1 second connection timeout with something
-   * more appropriate for the time it takes to connect over Dat + WebRTC
-   *
-   * TODO: make this a user-configurable option
-   */
-  const sub = thingLink.subscriptionClient
-  clearTimeout(sub.maxConnectTimeoutId)
-  // sub.maxConnectTimeoutId = setTimeout(() => {
-  //   if (sub.status !== sub.wsImpl.OPEN) {
-  //     sub.reconnecting = true
-  //     sub.close(false, true)
-  //   }
-  // }, 10000)
-
-  return thingLink
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const _global = typeof global !== 'undefined' ? global : (typeof window !== 'undefined' ? window : {});
+const nativeDatPeers = _global.experimental && _global.experimental.datPeers;
+const CONNECTION_TIMEOUT = 7000;
+const apollo_link_1 = require("apollo-link");
+const client_1 = require("./client");
+const createWebSocket_1 = require("../connection/dat/createWebSocket");
+const createDatPeerNetwork_1 = require("../connection/dat/createDatPeerNetwork");
+const ConnectionPath_1 = require("../connection/ConnectionPath");
+const connect_1 = require("../connection/connect");
+const protocol_1 = require("subscriptions-transport-ws/dist/protocol");
+const randomBytes_1 = require("../p2pCrypto/randomBytes");
+class ThingLink extends apollo_link_1.ApolloLink {
+    constructor(paramsOrClient) {
+        super();
+        if (paramsOrClient instanceof client_1.Client) {
+            this.client = paramsOrClient;
+        }
+        else {
+            const { identityKeys, peerIdentityPublicKey, protocol = protocol_1.GRAPHQL_WS, initiator = true, timeout = CONNECTION_TIMEOUT, datPeers = nativeDatPeers, webSocketImpl, websocketURL, wrtc, } = paramsOrClient;
+            const datPeerNetwork = createDatPeerNetwork_1.default({
+                datPeers,
+                createWebSocket: createWebSocket_1.default({
+                    identityKeys,
+                    webSocketImpl,
+                    websocketURL,
+                }),
+            });
+            const connectionPath = ConnectionPath_1.default({
+                identityKeys,
+                peerIdentityPublicKey,
+                datPeerNetwork,
+                wrtc,
+                initiator,
+            });
+            const createConnection = async () => {
+                const sessionID = (await randomBytes_1.default(32)).toString('hex');
+                return await connect_1.default({
+                    connectionPath,
+                    sessionID,
+                    protocol,
+                    shouldAbortConnection: () => false,
+                    timeout,
+                });
+            };
+            this.client = new client_1.Client(createConnection, paramsOrClient.options);
+        }
+    }
+    request(operation) {
+        return this.client.request(operation);
+    }
 }
-
-export default ThingLink
+exports.ThingLink = ThingLink;
+//# sourceMappingURL=ThingLink.js.map

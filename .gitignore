@@ -52,3 +52,6 @@ buck-out/
 !/example/dist/dat.json
 /example/keys
 /example/.dat-data
+
+/src/apolloClient/*.js
+/src/apolloClient/*.js.map
