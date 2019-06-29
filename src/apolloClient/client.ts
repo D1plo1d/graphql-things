@@ -1,3 +1,11 @@
+/*
+ * Based on:
+ * https://github.com/apollographql/subscriptions-transport-ws/blob/master/src/client.ts
+ * Commit:
+ * cf3f492
+ *
+ * March 11, 2019
+ */
 const TIMEOUT = 30000
 
 import * as Backoff from 'backo2';
@@ -304,7 +312,7 @@ export class Client {
   }
 
   private executeOperation(options: OperationOptions, handler: (error: Error[], result?: any) => void): string {
-    if (this.connection === null) {
+    if (this.connection === null && !this.connecting) {
       this.connect();
     }
 
@@ -512,20 +520,26 @@ export class Client {
   private async connect() {
     this.connecting = true
 
+    console.log('CONNECTING')
     try {
       this.connection = await this.createConnection()
     } catch(err) {
       this.connection = null
       this.connecting = false
-      this.eventEmitter.emit('error', err);
-      if (err instanceof ConnectionTimeout) {
-        this.errorAllOperations({
-          message: 'Connection timed out',
-          code: CONNECTION_TIMEOUT,
-        })
-      } else {
-        this.errorAllOperations(err)
-      }
+      this.eventEmitter.emit('error', err)
+
+      // setTimeout prevents a race condition preventing display of synchronous
+      // errors
+      setTimeout(() => {
+        if (err instanceof ConnectionTimeout) {
+          this.errorAllOperations({
+            message: 'Connection timed out',
+            code: CONNECTION_TIMEOUT,
+          })
+        } else {
+          this.errorAllOperations(err)
+        }
+      }, 0)
       return
     }
 

@@ -1,6 +1,14 @@
+const safeGlobal = (
+  (typeof global !== 'undefined' && global)
+  || (typeof window !== 'undefined' && window)
+  || {}
+)
+
+const nativeWebSocket = safeGlobal.WebSocket || safeGlobal.MozWebSocket
+
 const createWebSocket = ({
   identityKeys,
-  webSocketImpl = typeof window === 'object' ? window.WebSocket : null,
+  webSocketImpl = nativeWebSocket,
   websocketURL = 'wss://signal.tegapp.io/',
 }) => () => {
   if (!webSocketImpl) {

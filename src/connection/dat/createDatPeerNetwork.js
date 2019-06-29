@@ -5,6 +5,7 @@ import {
 } from '../../constants'
 
 import eventTrigger from '../../eventTrigger'
+import ConnectionTimeout from '../ConnectionTimeout'
 
 const debug = Debug('graphql-things:network')
 
@@ -18,6 +19,7 @@ const createDatPeerNetwork = ({
   onHandshakeReq,
   onError,
   persistent = false,
+  timeoutAt,
 }) => {
   let datPeers
   let websocket
@@ -43,6 +45,7 @@ const createDatPeerNetwork = ({
         datPeers.broadcast(message)
       }
       if (websocket != null && websocket.readyState === 1) {
+        console.log('ws open!')
         websocket.send(JSON.stringify(message))
       }
     },
@@ -111,8 +114,27 @@ const createDatPeerNetwork = ({
         }
       }
 
+      let cancelTimeout = () => {}
+
+      const timeoutPromise = () => new Promise((resolve, reject) => {
+        const ms = timeoutAt - Date.now()
+        console.log(ms)
+        const timeoutID = setTimeout(() => reject(new ConnectionTimeout()), ms)
+        cancelTimeout = () => {
+          resolve()
+          clearTimeout(timeoutID)
+        }
+      })
+
+      console.log('initializationList', initializationList)
       // Open dat connection and/or fallback web socket
-      await Promise.all(initializationList)
+      await Promise.race([
+        Promise.all(initializationList),
+        ...(timeoutAt == null ? [] : [timeoutPromise()]),
+      ])
+
+      cancelTimeout()
+      console.log('ready!')
 
       // Listen for dat messages
       if (datPeers != null) {

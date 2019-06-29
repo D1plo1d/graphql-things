@@ -81,20 +81,16 @@ const GraphqlThing = ({
       }, recycleSessionIDsAfter)
     }
 
-    const connectionPath = ConnectionPath({
+    const createSocket = wrapInSocketAPI({
+      sessionID,
+      timeout,
       identityKeys,
       peerIdentityPublicKey,
       initiator: false,
+      request: message,
       datPeer,
       datPeerNetwork,
-      request: message,
       wrtc,
-    })
-
-    const createSocket = wrapInSocketAPI({
-      connectionPath,
-      sessionID,
-      timeout,
     })
     const socket = createSocket(null, message.protocol)
 

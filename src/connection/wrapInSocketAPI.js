@@ -126,23 +126,15 @@ const wrapInSocketAPI = (params) => {
     socket.protocol = protocol
 
     const connectionPromise = (async () => {
-      const {
-        sessionID = (await randomBytes(32)).toString('hex'),
-        connectionPath,
-        timeout,
-      } = params
-
-      socket.sessionID = sessionID
+      socket.sessionID = params.sessionID
 
       // Make sure to return the socket before starting the connection
       await new Promise(resolve => setTimeout(resolve, 0))
 
       const nextConnection = await connect({
-        connectionPath,
-        sessionID,
+        ...params,
         protocol,
         shouldAbortConnection,
-        timeout,
       })
       onConnection(nextConnection)
     })()

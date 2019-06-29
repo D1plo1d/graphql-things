@@ -10,6 +10,7 @@ import {
 } from './inviteCodes'
 
 import { CONNECTION_TIMEOUT } from './connection/ConnectionTimeout'
+import connect from './connection/connect'
 
 /*
  * Client
@@ -27,6 +28,7 @@ export {
   createInvite,
   getInviteCode,
   parseInviteCode,
+  connect,
   ThingLink,
   GraphQLThing,
   CONNECTION_TIMEOUT,

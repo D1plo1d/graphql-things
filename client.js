@@ -10,6 +10,7 @@ import {
 } from './src/inviteCodes'
 
 import { CONNECTION_TIMEOUT } from './src/connection/ConnectionTimeout'
+import connect from './src/connection/connect'
 
 /*
  * Client
@@ -22,6 +23,7 @@ export {
   createInvite,
   getInviteCode,
   parseInviteCode,
+  connect,
   ThingLink,
   CONNECTION_TIMEOUT,
 }
