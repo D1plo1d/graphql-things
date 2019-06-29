@@ -520,7 +520,6 @@ export class Client {
   private async connect() {
     this.connecting = true
 
-    console.log('CONNECTING')
     try {
       this.connection = await this.createConnection()
     } catch(err) {

@@ -45,7 +45,6 @@ const createDatPeerNetwork = ({
         datPeers.broadcast(message)
       }
       if (websocket != null && websocket.readyState === 1) {
-        console.log('ws open!')
         websocket.send(JSON.stringify(message))
       }
     },
@@ -118,7 +117,6 @@ const createDatPeerNetwork = ({
 
       const timeoutPromise = () => new Promise((resolve, reject) => {
         const ms = timeoutAt - Date.now()
-        console.log(ms)
         const timeoutID = setTimeout(() => reject(new ConnectionTimeout()), ms)
         cancelTimeout = () => {
           resolve()
@@ -126,7 +124,6 @@ const createDatPeerNetwork = ({
         }
       })
 
-      console.log('initializationList', initializationList)
       // Open dat connection and/or fallback web socket
       await Promise.race([
         Promise.all(initializationList),
@@ -134,7 +131,6 @@ const createDatPeerNetwork = ({
       ])
 
       cancelTimeout()
-      console.log('ready!')
 
       // Listen for dat messages
       if (datPeers != null) {
