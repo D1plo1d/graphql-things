@@ -1,7 +1,6 @@
 import Debug from 'debug'
 import EventEmitter from 'eventemitter3'
 
-import randomBytes from '../p2pCrypto/randomBytes'
 import connect from './connect'
 
 const debug = Debug('graphql-things:socket')

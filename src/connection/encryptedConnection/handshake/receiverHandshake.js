@@ -1,4 +1,5 @@
 import { createECDHKey, createSessionKey } from '../../../p2pCrypto/keys'
+import { encrypt } from '../../../p2pCrypto/encryption'
 
 import handshakeResMessage from '../../../messages/handshakeResMessage'
 import { validateHandshakeReq } from '../../../messages/handshakeReqMessage'
@@ -10,6 +11,7 @@ const receiverHandshake = async ({
   identityKeys,
   peerIdentityPublicKey,
   request,
+  meta,
 }) => {
   /*
    * parse and validate the handshake request
@@ -26,6 +28,9 @@ const receiverHandshake = async ({
     peerEphemeralPublicKey: request.ephemeralPublicKey,
   })
 
+  const encryptedData = await encrypt({ meta }, { sessionKey })
+
+
   /*
    * send a handshake response
    */
@@ -35,6 +40,7 @@ const receiverHandshake = async ({
     identityKeys,
     peerIdentityPublicKey,
     ephemeralKeys,
+    encryptedData,
   })
 
   currentConnection.send(response)

@@ -24,6 +24,8 @@ const createClient = (inviteCode) => {
       createConnection: () => connect({
         ...invite,
         timeout: 30000,
+        // eslint-disable-next-line no-console
+        onMeta: meta => console.log('Received meta data from peer', meta),
       }),
       options: {
         reconnect: false,

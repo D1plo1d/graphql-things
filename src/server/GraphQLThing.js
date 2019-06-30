@@ -20,9 +20,10 @@ const GraphqlThing = ({
   websocketURL,
   // authenticate({ peerIdentityPublicKey }) => boolean
   authenticate,
-  timeout = 7000,
+  timeout,
   recycleSessionIDsAfter = 20000,
   wrtc,
+  meta,
 }) => {
   if (typeof authenticate !== 'function') {
     throw new Error('an authenticate callback is required')
@@ -91,6 +92,7 @@ const GraphqlThing = ({
       datPeer,
       datPeerNetwork,
       wrtc,
+      meta,
     })
     const socket = createSocket(null, message.protocol)
 

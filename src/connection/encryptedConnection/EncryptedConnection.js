@@ -2,6 +2,7 @@ import { encrypt, decrypt } from '../../p2pCrypto/encryption'
 
 import Connection from '../Connection'
 
+import encryptedDataMessage from '../../messages/encryptedDataMessage'
 import initiatorHandshake from './handshake/initiatorHandshake'
 import receiverHandshake from './handshake/receiverHandshake'
 
@@ -11,6 +12,8 @@ const EncryptedConnection = ({
   peerIdentityPublicKey: peerIdentityPublicKeyParam,
   // the connection request message if initiator = false
   request,
+  meta,
+  onMeta,
 }) => async ({
   protocol,
   sessionID,
@@ -44,6 +47,7 @@ const EncryptedConnection = ({
 
   const {
     sessionKey,
+    meta: receivedMeta,
   } = await handshake({
     currentConnection,
     protocol,
@@ -51,7 +55,12 @@ const EncryptedConnection = ({
     identityKeys,
     peerIdentityPublicKey,
     request,
+    meta,
   })
+
+  if (initiator) {
+    onMeta(receivedMeta)
+  }
 
   const nextConnection = Connection({
     sessionID,
@@ -67,11 +76,11 @@ const EncryptedConnection = ({
         ...data,
       }, { sessionKey })
 
-      currentConnection.send({
+      currentConnection.send(encryptedDataMessage({
         peerIdentityPublicKey,
         sessionID,
         encryptedData,
-      })
+      }))
     },
     close: () => {
       currentConnection.close()

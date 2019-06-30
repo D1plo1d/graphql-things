@@ -53,6 +53,11 @@ const thing = GraphQLThing({
   identityKeys,
   authenticate,
   wrtc,
+  meta: {
+    // This can be anything you want.
+    schemaName: 'books',
+    schemaVersion: '1.0',
+  },
 })
 
 const options = {

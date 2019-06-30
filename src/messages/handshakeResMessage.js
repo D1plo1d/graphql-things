@@ -13,6 +13,7 @@ export const validateHandshakeRes = (handshakeReq) => {
     encryptionAlgorithm,
     identityPublicKey: idPK,
     ephemeralPublicKey: epPK,
+    encryptedData,
   } = handshakeReq
 
   if (type !== HANDSHAKE_RES) {
@@ -33,6 +34,9 @@ export const validateHandshakeRes = (handshakeReq) => {
   if (typeof epPK !== 'string') {
     throw new Error(`Invalid peer ephemeral public key: ${epPK}`)
   }
+  if (typeof encryptedData !== 'string') {
+    throw new Error('Invalid encrypted data')
+  }
 }
 
 /*
@@ -45,6 +49,7 @@ const handshakeResMessage = ({
   peerIdentityPublicKey,
   protocol,
   sessionID,
+  encryptedData,
 }) => ({
   type: HANDSHAKE_RES,
   protocol,
@@ -54,6 +59,7 @@ const handshakeResMessage = ({
   encryptionAlgorithm: ENCRYPTION_ALGORITHM,
   identityPublicKey: identityKeys.publicKey,
   ephemeralPublicKey: ephemeralKeys.publicKey,
+  encryptedData,
 })
 
 export default handshakeResMessage

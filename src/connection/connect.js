@@ -34,6 +34,8 @@ const connect = async (options) => {
     websocketURL,
     wrtc,
     shouldAbortConnection = () => false,
+    meta = {},
+    onMeta,
   } = options
 
   let {
@@ -65,6 +67,8 @@ const connect = async (options) => {
     request,
     webSocketImpl,
     websocketURL,
+    meta,
+    onMeta,
   })
 
   const connectionReducer = (currentConnectionPromise, nextConnectionFn) => (

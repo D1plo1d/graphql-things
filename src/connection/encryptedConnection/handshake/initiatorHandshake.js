@@ -1,4 +1,5 @@
 import { createECDHKey, createSessionKey } from '../../../p2pCrypto/keys'
+import { decrypt } from '../../../p2pCrypto/encryption'
 
 import eventTrigger from '../../../eventTrigger'
 
@@ -31,7 +32,10 @@ const initiatorHandshake = async ({
   /*
    * wait for a vaild handshake response
    */
-  const sessionKey = await eventTrigger(currentConnection, 'data', {
+  const {
+    sessionKey,
+    meta,
+  } = await eventTrigger(currentConnection, 'data', {
     filter: result => result != null,
     map: async (response) => {
       try {
@@ -45,7 +49,9 @@ const initiatorHandshake = async ({
           peerEphemeralPublicKey: response.ephemeralPublicKey,
         })
 
-        return key
+        const data = await decrypt(response.encryptedData, { sessionKey: key })
+
+        return { sessionKey: key, meta: data.meta }
       } catch (e) {
         /*
          * invalid messages may be caused by MITM attacks with invalid data so
@@ -57,6 +63,7 @@ const initiatorHandshake = async ({
   })
 
   return {
+    meta,
     sessionKey,
   }
 }
