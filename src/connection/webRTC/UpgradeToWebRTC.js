@@ -101,7 +101,9 @@ const UpgradeToWebRTC = ({
 
   const addListeners = () => {
     rtcPeer.on('data', dechunkifier((data) => {
-      rxDebug(data)
+      if (debug.enabled) {
+        rxDebug(data.toString())
+      }
       nextConnection.emit('data', data)
     }))
 
