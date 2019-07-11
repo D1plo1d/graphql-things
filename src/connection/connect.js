@@ -18,7 +18,7 @@ const nativeDatPeers = (
   safeGlobal.experimental && safeGlobal.experimental.datPeers
 )
 
-const CONNECTION_TIMEOUT = 7000
+const CONNECTION_TIMEOUT = 30000
 
 const connect = async (options) => {
   const {
