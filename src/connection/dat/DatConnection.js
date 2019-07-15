@@ -44,7 +44,7 @@ const DatConnection = ({
   const sendCurrentMessage = () => {
     try {
       if (timeoutAt != null && Date.now() > timeoutAt) {
-        error(new ConnectionTimeout('Connection timed out'))
+        error(new ConnectionTimeout('Dat Connection timed out'))
         return
       }
 

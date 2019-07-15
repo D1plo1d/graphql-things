@@ -84,6 +84,8 @@ export const SOCKET_STATES = {
 export class Client {
   public connection: any;
   public operations: Operations;
+  public isTimedOut: boolean;
+  public nextReconnectAttempt: any;
   private connecting: boolean;
   private nextOperationId: number;
   private connectionParams: Function;
@@ -113,7 +115,7 @@ export class Client {
       connectionCallback = undefined,
       connectionParams = {},
       timeout = TIMEOUT,
-      reconnect = false,
+      reconnect = true,
       reconnectionAttempts = Infinity,
       lazy = false,
       inactivityTimeout = 0,
@@ -137,6 +139,8 @@ export class Client {
     this.connection = null;
     this.connecting = false;
     this.connectionParams = this.getConnectionParams(connectionParams);
+    this.isTimedOut = false;
+    this.nextReconnectAttempt = null;
 
     if (!this.lazy) {
       this.connect();
@@ -362,6 +366,7 @@ export class Client {
     if (this.tryReconnectTimeoutId) {
       clearTimeout(this.tryReconnectTimeoutId);
       this.tryReconnectTimeoutId = null;
+      this.nextReconnectAttempt = null
     }
   }
 
@@ -497,6 +502,7 @@ export class Client {
     this.tryReconnectTimeoutId = setTimeout(() => {
       this.connect();
     }, delay);
+    this.nextReconnectAttempt = Date.now() + delay
   }
 
   private flushUnsentMessagesQueue() {
@@ -525,23 +531,24 @@ export class Client {
     } catch(err) {
       this.connection = null
       this.connecting = false
-      this.eventEmitter.emit('error', err)
 
       // setTimeout prevents a race condition preventing display of synchronous
       // errors
       setTimeout(() => {
         if (err instanceof ConnectionTimeout) {
-          this.errorAllOperations({
-            message: 'Connection timed out',
-            code: CONNECTION_TIMEOUT,
-          })
+          if (!this.closedByUser) {
+            this.isTimedOut = true
+            this.tryReconnect()
+          }
         } else {
+          this.eventEmitter.emit('error', err)
           this.errorAllOperations(err)
         }
       }, 0)
       return
     }
 
+    this.isTimedOut = false
     this.connecting = false
     this.closedByUser = false;
     this.eventEmitter.emit(this.reconnecting ? 'reconnecting' : 'connecting');

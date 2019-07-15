@@ -19,21 +19,30 @@ const createClient = (inviteCode) => {
     return null
   }
 
-  return new ApolloClient({
-    link: new ThingLink({
-      createConnection: () => connect({
-        ...invite,
-        timeout: 30000,
-        // eslint-disable-next-line no-console
-        onMeta: meta => console.log('Received meta data from peer', meta),
-      }),
-      options: {
-        reconnect: false,
-      },
+  const link = new ThingLink({
+    createConnection: () => connect({
+      ...invite,
+      timeout: 30000,
+      // eslint-disable-next-line no-console
+      onMeta: meta => console.log('Received meta data from peer', meta),
     }),
+  })
+
+  return new ApolloClient({
+    link,
+    resolvers: link.resolvers,
     cache: new InMemoryCache(),
   })
 }
+
+const GET_CONNECTION_STATE = gql`
+  query {
+    isConnected @client
+    isTimedOut @client
+    isAttemptingReconnect @client
+    secondsTillNextReconnect @client
+  }
+`
 
 const GET_BOOKS = gql`
   query {
@@ -85,26 +94,54 @@ const App = () => {
 
   return (
     <ApolloProvider client={client}>
-      <Query query={GET_BOOKS}>
-        {({ loading, error, data }) => {
-          if (loading) {
-            return <div>Connecting to GraphQL Thing...</div>
+      <Query
+        query={GET_CONNECTION_STATE}
+        pollInterval={500}
+      >
+        {(connection) => {
+          if (connection.error) {
+            return <div>{JSON.stringify(connection.error)}</div>
           }
-          if (error) {
-            return <div>{JSON.stringify(error)}</div>
+
+          if (connection.data != null && connection.data.isTimedOut) {
+            const {
+              isAttemptingReconnect,
+              secondsTillNextReconnect,
+            } = connection.data
+
+            return (
+              <div>
+                Connection Timed Out.
+                {
+                  (isAttemptingReconnect && ' Reconnecting...')
+                  || ` Reconnecting in ${secondsTillNextReconnect} seconds...`
+                }
+              </div>
+            )
           }
 
           return (
-            <div>
-              <h2>GraphQL Things Example</h2>
-              {data.books.map(book => (
-                <div key={`${book.title} - ${book.author}`}>
-                  {`${book.title} - ${book.author}`}
-                </div>
-              ))
+            <Query query={GET_BOOKS}>
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return <div>Connecting to GraphQL Thing...</div>
+                }
+                if (error) {
+                  return <div>{JSON.stringify(error)}</div>
+                }
 
-              }
-            </div>
+                return (
+                  <div>
+                    <h2>GraphQL Things Example</h2>
+                    { data.books.map(book => (
+                      <div key={`${book.title} - ${book.author}`}>
+                        {`${book.title} - ${book.author}`}
+                      </div>
+                    ))}
+                  </div>
+                )
+              }}
+            </Query>
           )
         }}
       </Query>

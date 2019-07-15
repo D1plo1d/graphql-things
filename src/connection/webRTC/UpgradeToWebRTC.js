@@ -64,7 +64,7 @@ const UpgradeToWebRTC = ({
       rtcPeer.removeListener('signal', sendSignalToPeer)
       currentConnection.removeListener('data', receiveSignalFromPeer)
 
-      reject(new Error('connection timed out'))
+      reject(new Error('WebRTC connection timed out'))
     }, timeoutMS)
 
     eventTrigger(rtcPeer, 'connect')
