@@ -133,7 +133,7 @@ export class Client {
     this.lazy = !!lazy;
     this.inactivityTimeout = inactivityTimeout;
     this.closedByUser = false;
-    this.backoff = new Backoff({ jitter: 0.5 });
+    this.backoff = new Backoff({ jitter: 0.5, initialDelay: 500 });
     this.eventEmitter = new EventEmitter();
     this.middlewares = [];
     this.connection = null;
@@ -225,6 +225,17 @@ export class Client {
         };
       },
     };
+  }
+
+  public tryReconnectNow() {
+    if (this.status !== SOCKET_STATES.CLOSED) return
+
+    if (this.tryReconnectTimeoutId != null) {
+      clearTimeout(this.tryReconnectTimeoutId)
+    }
+    this.nextReconnectAttempt = Date.now()
+
+    this.connect()
   }
 
   public on(eventName: string, callback: ListenerFn, context?: any): Function {
@@ -365,9 +376,10 @@ export class Client {
   private clearTryReconnectTimeout() {
     if (this.tryReconnectTimeoutId) {
       clearTimeout(this.tryReconnectTimeoutId);
-      this.tryReconnectTimeoutId = null;
-      this.nextReconnectAttempt = null
     }
+
+    this.tryReconnectTimeoutId = null;
+    this.nextReconnectAttempt = null;
   }
 
   private clearInactivityTimeout() {

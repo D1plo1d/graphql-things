@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { render } from 'react-dom'
 
 import gql from 'graphql-tag'
-import { ApolloProvider, Query } from 'react-apollo'
+import { ApolloProvider, Query, Mutation } from 'react-apollo'
 import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 
@@ -41,6 +41,12 @@ const GET_CONNECTION_STATE = gql`
     isTimedOut @client
     isAttemptingReconnect @client
     secondsTillNextReconnect @client
+  }
+`
+
+const TRY_RECONNECT_NOW = gql`
+  mutation tryReconnectNow {
+    tryReconnect @client
   }
 `
 
@@ -109,14 +115,26 @@ const App = () => {
               secondsTillNextReconnect,
             } = connection.data
 
+            if (isAttemptingReconnect) {
+              return (
+                <div>
+                  Connection Timed Out. Attempting to Reconnect...
+                </div>
+              )
+            }
+
             return (
-              <div>
-                Connection Timed Out.
-                {
-                  (isAttemptingReconnect && ' Reconnecting...')
-                  || ` Reconnecting in ${secondsTillNextReconnect} seconds...`
-                }
-              </div>
+              <Mutation mutation={TRY_RECONNECT_NOW}>
+                {tryReconnectNow => (
+                  <div>
+                    Connection Timed Out.
+                    {` Reconnecting in ${secondsTillNextReconnect} seconds... `}
+                    <button type="button" onClick={tryReconnectNow}>
+                      Retry Now
+                    </button>
+                  </div>
+                )}
+              </Mutation>
             )
           }
 

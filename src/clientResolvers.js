@@ -11,7 +11,7 @@ const secondsTillNextReconnect = (thingClient) => {
 const clientResolvers = thingClient => ({
   Mutation: {
     tryReconnect: () => {
-      thingClient.tryReconnect()
+      thingClient.tryReconnectNow()
     },
   },
   Query: {
