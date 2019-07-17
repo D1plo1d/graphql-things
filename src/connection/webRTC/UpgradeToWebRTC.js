@@ -108,7 +108,7 @@ const UpgradeToWebRTC = ({
     rtcPeer.on('error', onError)
 
     rtcPeer.on('close', () => {
-      debug('disconnected')
+      debug('close')
       nextConnection.emit('close')
     })
   }

@@ -492,6 +492,8 @@ export class Client {
   }
 
   private tryReconnect() {
+    this.isTimedOut = true;
+
     if (!this.reconnect || this.backoff.attempts >= this.reconnectionAttempts) {
       this.errorAllOperations({
         message: 'Connection timed out',
