@@ -100,23 +100,21 @@ const createDatPeerNetwork = ({
       }
 
       if (createWebSocket != null) {
-        const websocketPromise = network.connectWebsocket({
-          ignoreErrors: datPeersParam != null,
-        })
+        network.connectWebsocket()
 
         /*
          * wait for the websocket connection if it's our only available network
          * option
          */
         if (datPeersParam == null) {
-          initializationList.push(websocketPromise)
+          initializationList.push(network.waitForWebsocket())
         }
       }
 
       let cancelTimeout = () => {}
 
       const timeoutPromise = () => new Promise((resolve, reject) => {
-        const ms = timeoutAt - Date.now()
+        const ms = Math.max(0, timeoutAt - Date.now())
         const timeoutID = setTimeout(() => reject(new ConnectionTimeout()), ms)
         cancelTimeout = () => {
           resolve()
@@ -144,30 +142,40 @@ const createDatPeerNetwork = ({
     addWSListeners: () => {
       websocket.addEventListener('message', network.onWSMessage)
       websocket.addEventListener('close', network.onWSClose)
+      websocket.addEventListener('open', network.onWSOpen)
+      websocket.addEventListener('error', network.onWSError)
     },
     removeWSListeners: () => {
       websocket.removeEventListener('message', network.onWSMessage)
       websocket.removeEventListener('close', network.onWSClose)
+      websocket.removeEventListener('open', network.onWSOpen)
+      websocket.addEventListener('error', network.onWSError)
     },
-    connectWebsocket: async ({ ignoreErrors = true } = {}) => {
+    connectWebsocket: () => {
       debug('Connecting to WebSocket...')
       websocket = createWebSocket()
 
       // Listen for websocket messages
       network.addWSListeners()
-
-      let openPromise = eventTrigger(websocket, 'open')
-        .then(() => debug('Connected to WebSocket'))
-
-      if (ignoreErrors) {
-        openPromise = openPromise.catch(() => {})
-      }
-
-      await openPromise
     },
+    waitForWebsocket: () => new Promise((resolve, reject) => {
+      if (network.wsOpenCallbacks != null) {
+        network.wsOpenCallbacks.reject(
+          new Error('waitForWebsocket called twice'),
+        )
+      }
+      network.wsOpenCallbacks = { resolve, reject }
+    }),
     onWSMessage: (event) => {
       network.onMessage({ message: JSON.parse(event.data) })
     },
+    onWSOpen: () => {
+      if (network.wsOpenCallbacks != null) {
+        network.wsOpenCallbacks.resolve()
+        network.wsOpenCallbacks = null
+      }
+    },
+    onWSError: () => {},
     onWSClose: () => {
       network.removeWSListeners()
       websocket = null
