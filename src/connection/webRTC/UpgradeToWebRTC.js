@@ -89,8 +89,12 @@ const UpgradeToWebRTC = ({
 
   const nextConnection = Connection({
     send: (data) => {
-      txDebug(data)
-      sendInChunks(data)
+      try {
+        txDebug(data)
+        sendInChunks(data)
+      } catch (e) {
+        rtcPeer.destroy(e)
+      }
     },
     close: () => rtcPeer.destroy(),
   })
