@@ -82,19 +82,24 @@ const UpgradeToWebRTC = ({
    * Wrap the webRTC peer in a Connection object
    */
 
+  let sendErrored = false
+
   // eslint-disable-next-line no-underscore-dangle
   const sendInChunks = chunkifier(rtcPeer._channel, (data) => {
-    rtcPeer.send(data)
+    if (sendErrored) return
+
+    try {
+      rtcPeer.send(data)
+    } catch (e) {
+      sendErrored = true
+      rtcPeer.destroy(e)
+    }
   })
 
   const nextConnection = Connection({
     send: (data) => {
-      try {
-        txDebug(data)
-        sendInChunks(data)
-      } catch (e) {
-        rtcPeer.destroy(e)
-      }
+      txDebug(data)
+      sendInChunks(data)
     },
     close: () => rtcPeer.destroy(),
   })
