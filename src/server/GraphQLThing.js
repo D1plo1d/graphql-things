@@ -2,8 +2,6 @@ import EventEmitter from 'eventemitter3'
 import Debug from 'debug'
 import ws from 'ws'
 
-import ConnectionPath from '../connection/ConnectionPath'
-
 import createWebSocket from '../connection/dat/createWebSocket'
 import createDatPeerNetwork from '../connection/dat/createDatPeerNetwork'
 
@@ -103,11 +101,6 @@ const GraphqlThing = ({
     handleHandshakeReq(params).catch((e) => {
       debug('error', e)
     })
-  }
-
-  datPeerNetwork.onError = (error) => {
-    socketServer.emit('error', error)
-    throw new Error(error)
   }
 
   return socketServer

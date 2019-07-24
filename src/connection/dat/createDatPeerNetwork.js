@@ -4,7 +4,6 @@ import {
   HANDSHAKE_REQ,
 } from '../../constants'
 
-import eventTrigger from '../../eventTrigger'
 import ConnectionTimeout from '../ConnectionTimeout'
 
 const debug = Debug('graphql-things:network')
@@ -13,11 +12,9 @@ const debug = Debug('graphql-things:network')
 const WEBSOCKET_RECONNECT_MS = 500
 
 const createDatPeerNetwork = ({
-  // fallbackSignallingServer = 'ws://signal.tegapp.io/',
   createWebSocket,
   datPeers: datPeersParam,
   onHandshakeReq,
-  onError,
   persistent = false,
   timeoutAt,
 }) => {
@@ -28,7 +25,6 @@ const createDatPeerNetwork = ({
 
   const network = {
     onHandshakeReq,
-    onError,
     persistent,
     responseListeners: {},
     keyFor: sessionID => (
@@ -124,7 +120,7 @@ const createDatPeerNetwork = ({
 
       // Open dat connection and/or fallback web socket
       await Promise.race([
-        Promise.all(initializationList),
+        ...initializationList,
         ...(timeoutAt == null ? [] : [timeoutPromise()]),
       ])
 
