@@ -23,6 +23,9 @@ const createDatPeerNetwork = ({
   let initialized = false
   let wsReconnectTimeout
 
+  let isAlive
+  let pingInterval
+
   const network = {
     onHandshakeReq,
     persistent,
@@ -81,6 +84,10 @@ const createDatPeerNetwork = ({
         clearTimeout(wsReconnectTimeout)
       }
 
+      if (pingInterval != null) {
+        clearInterval(pingInterval)
+      }
+
       network.responseListeners = {}
     },
     connect: async () => {
@@ -126,6 +133,10 @@ const createDatPeerNetwork = ({
 
       cancelTimeout()
 
+      // By pinging the websocket we can determine when the connection is
+      // closed due to network outage.
+      pingInterval = setInterval(network.pingWebsocket, 5000)
+
       // Listen for dat messages
       if (datPeers != null) {
         datPeers.addEventListener('message', network.onMessage)
@@ -140,15 +151,18 @@ const createDatPeerNetwork = ({
       websocket.addEventListener('close', network.onWSClose)
       websocket.addEventListener('open', network.onWSOpen)
       websocket.addEventListener('error', network.onWSError)
+      websocket.addEventListener('pong', network.onWebsocketPong)
     },
     removeWSListeners: () => {
       websocket.removeEventListener('message', network.onWSMessage)
       websocket.removeEventListener('close', network.onWSClose)
       websocket.removeEventListener('open', network.onWSOpen)
-      websocket.addEventListener('error', network.onWSError)
+      websocket.removeEventListener('error', network.onWSError)
+      websocket.removeEventListener('pong', network.onWebsocketPong)
     },
     connectWebsocket: () => {
       debug('Connecting to WebSocket...')
+      isAlive = true
       websocket = createWebSocket()
 
       // Listen for websocket messages
@@ -162,6 +176,25 @@ const createDatPeerNetwork = ({
       }
       network.wsOpenCallbacks = { resolve, reject }
     }),
+    onWebsocketPong: () => {
+      isAlive = true
+    },
+    pingWebsocket: () => {
+      // See https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
+      if (
+        websocket != null
+        && websocket.readyState === 1
+        && websocket.ping != null
+      ) {
+        if (isAlive === false) {
+          websocket.terminate()
+          return
+        }
+
+        isAlive = false
+        websocket.ping()
+      }
+    },
     onWSMessage: (event) => {
       network.onMessage({ message: JSON.parse(event.data) })
     },
