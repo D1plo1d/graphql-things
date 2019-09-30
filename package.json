@@ -12,9 +12,11 @@
     "dist/**/*",
     "client.js"
   ],
-  "presets": [
-    "@babel/preset-env"
-  ],
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
   "scripts": {
     "watch": "tsc --target ES2017 -w",
     "bootstrap": "yarn && yarn build && yarn build-example && yarn create-example-keys",
