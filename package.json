@@ -1,6 +1,6 @@
 {
   "name": "graphql-things",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "P2P GraphQL for the Internet of Things",
   "main": "dist/index.js",
   "repository": "https://github.com/d1plo1d/graphql-things",
@@ -14,12 +14,15 @@
   ],
   "babel": {
     "presets": [
-      ["@babel/preset-env", {
-        "exclude": [
-          "@babel/plugin-transform-regenerator",
-          "@babel/plugin-proposal-async-generator-functions"
-        ]
-      }]
+      [
+        "@babel/preset-env",
+        {
+          "exclude": [
+            "@babel/plugin-transform-regenerator",
+            "@babel/plugin-proposal-async-generator-functions"
+          ]
+        }
+      ]
     ]
   },
   "scripts": {
