@@ -1,21 +1,21 @@
 import {
   createECDHKey,
   getPublicKey,
-} from './src/p2pCrypto/keys'
+} from './dist/p2pCrypto/keys'
 
 import {
   createInvite,
   getInviteCode,
   parseInviteCode,
-} from './src/inviteCodes'
+} from './dist/inviteCodes'
 
-import { CONNECTION_TIMEOUT } from './src/connection/ConnectionTimeout'
-import connect from './src/connection/connect'
+import { CONNECTION_TIMEOUT } from './dist/connection/ConnectionTimeout'
+import connect from './dist/connection/connect'
 
 /*
  * Client
  */
-import { ThingLink } from './src/apolloClient/ThingLink'
+import { ThingLink } from './dist/apolloClient/ThingLink'
 
 export {
   createECDHKey,
