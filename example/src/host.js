@@ -35,9 +35,9 @@ const datPeers = dat.getPeers(DAT_URL)
 * return true to allow the connection if an authorized user can be found with
 * the identity public key.
 */
-const authenticate = ({ peerIdentityPublicKey }) => {
+const authenticate = ({ peerIdentityPublicKey, authToken }) => {
   // eslint-disable-next-line no-console
-  console.log(`\n\nNew connection from ${peerIdentityPublicKey}`)
+  console.log(`\n\nNew connection from ${peerIdentityPublicKey} token: ${authToken}`)
 
   /*
    * IMPORTANT: REPLACE THIS CODE!

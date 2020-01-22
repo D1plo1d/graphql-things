@@ -14,6 +14,8 @@ const ConnectionPath = ({
   wrtc,
   meta,
   onMeta,
+  authToken,
+  authenticate,
 }) => {
   if (initiator == null) {
     throw new Error('initiator cannot be null. Must be either true or false')
@@ -35,6 +37,8 @@ const ConnectionPath = ({
       request,
       meta,
       onMeta,
+      authToken,
+      authenticate,
     }),
     // Exchange SDPs over the secure connection and switch to WebRTC
     UpgradeToWebRTC({

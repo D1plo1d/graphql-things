@@ -1,11 +1,12 @@
 import { createECDHKey, createSessionKey } from '../../../p2pCrypto/keys'
-import { decrypt } from '../../../p2pCrypto/encryption'
+import { encrypt, decrypt } from '../../../p2pCrypto/encryption'
 
 import eventTrigger from '../../../eventTrigger'
 
-
 import handshakeReqMessage from '../../../messages/handshakeReqMessage'
 import { validateHandshakeRes } from '../../../messages/handshakeResMessage'
+import authMessage from '../../../messages/authMessage'
+import encryptedDataMessage from '../../../messages/encryptedDataMessage'
 
 const initiatorHandshake = async ({
   currentConnection,
@@ -13,6 +14,7 @@ const initiatorHandshake = async ({
   sessionID,
   identityKeys,
   peerIdentityPublicKey,
+  authToken,
 }) => {
   const ephemeralKeys = await createECDHKey()
 
@@ -61,6 +63,19 @@ const initiatorHandshake = async ({
       }
     },
   })
+
+  /*
+   * send the authToken
+   */
+  const encryptedData = await encrypt(authMessage({ authToken }), { sessionKey })
+
+  currentConnection.send(
+    encryptedDataMessage({
+      peerIdentityPublicKey,
+      sessionID,
+      encryptedData,
+    }),
+  )
 
   return {
     meta,

@@ -36,6 +36,8 @@ const connect = async (options) => {
     shouldAbortConnection = () => false,
     meta = {},
     onMeta,
+    authToken,
+    authenticate,
   } = options
 
   let {
@@ -69,6 +71,8 @@ const connect = async (options) => {
     websocketURL,
     meta,
     onMeta,
+    authToken,
+    authenticate,
   })
 
   const connectionReducer = (currentConnectionPromise, nextConnectionFn) => (

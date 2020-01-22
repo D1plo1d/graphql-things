@@ -71,8 +71,6 @@ const GraphqlThing = ({
 
     debug(`new connection from ${peerIdentityPublicKey}`)
 
-    if (authenticate({ peerIdentityPublicKey }) === false) return
-
     sessionIDs[sessionID] = true
     if (timeout) {
       setTimeout(() => {
@@ -91,6 +89,7 @@ const GraphqlThing = ({
       datPeerNetwork,
       wrtc,
       meta,
+      authenticate,
     })
     const socket = createSocket(null, message.protocol)
 

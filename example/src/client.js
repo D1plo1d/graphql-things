@@ -25,6 +25,7 @@ const createClient = (inviteCode) => {
       timeout: 30000,
       // eslint-disable-next-line no-console
       onMeta: meta => console.log('Received meta data from peer', meta),
+      authToken: 'YOUR_JWT_OR_OPAQUE_TOKEN_HERE',
     }),
   })
 

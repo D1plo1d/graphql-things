@@ -14,6 +14,8 @@ const EncryptedConnection = ({
   request,
   meta,
   onMeta,
+  authToken,
+  authenticate,
 }) => async ({
   protocol,
   sessionID,
@@ -56,6 +58,8 @@ const EncryptedConnection = ({
     peerIdentityPublicKey,
     request,
     meta,
+    authToken,
+    authenticate, 
   })
 
   if (initiator) {
