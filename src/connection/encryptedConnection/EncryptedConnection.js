@@ -1,3 +1,5 @@
+import Debug from 'debug'
+
 import { encrypt, decrypt } from '../../p2pCrypto/encryption'
 
 import Connection from '../Connection'
@@ -5,6 +7,9 @@ import Connection from '../Connection'
 import encryptedDataMessage from '../../messages/encryptedDataMessage'
 import initiatorHandshake from './handshake/initiatorHandshake'
 import receiverHandshake from './handshake/receiverHandshake'
+
+const rxDebug = Debug('graphql-things:encrypted:rx')
+const txDebug = Debug('graphql-things:encrypted:tx')
 
 const EncryptedConnection = ({
   initiator,
@@ -71,14 +76,18 @@ const EncryptedConnection = ({
     send: async (data) => {
       lastTXMessageID += 1
 
+      const message = {
+        id: lastTXMessageID,
+        ...data,
+      }
+
+      txDebug(message)
+
       /*
        * due to the asynchronous nature of encryption message IDs may be sent
        * out of order.
        */
-      const encryptedData = await encrypt({
-        id: lastTXMessageID,
-        ...data,
-      }, { sessionKey })
+      const encryptedData = await encrypt(message, { sessionKey })
 
       currentConnection.send(encryptedDataMessage({
         peerIdentityPublicKey,
@@ -104,6 +113,8 @@ const EncryptedConnection = ({
       return
     }
     if (receivedMessageIDs[data.id] !== true) {
+      rxDebug(data)
+
       receivedMessageIDs[data.id] = true
       nextConnection.emit('data', data)
     }

@@ -25,6 +25,7 @@ const UpgradeToWebRTC = ({
   const rtcPeer = new Peer({
     initiator,
     wrtc,
+    trickle: false,
   })
 
   const onIceChange = (state) => {

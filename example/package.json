@@ -31,7 +31,7 @@
     "react-dom": "^16.8.0-alpha.1",
     "react-qr-reader": "^2.1.2",
     "subscriptions-transport-ws": "^0.9.15",
-    "wrtc": "^0.3.4"
+    "wrtc": "^0.4.3"
   },
   "resolutions": {
     "caniuse-lite": "^1.0.30000974",
