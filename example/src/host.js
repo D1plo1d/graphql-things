@@ -70,6 +70,7 @@ const options = {
   // onOperation: async (msg, params, socket) => ({
   //   ...params,
   //   context: {
+  //     ...socket.authContext,
   //     sessionID: socket.sessionID,
   //     peerIdentityPublicKey: socket.peerIdentityPublicKey,
   //   },

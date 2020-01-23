@@ -71,13 +71,18 @@ const receiverHandshake = async ({
   validateAuthMessage(auth)
   const { authToken } = auth
 
-  await authenticate({
+  const authContext = await authenticate({
     peerIdentityPublicKey,
     authToken,
   })
 
+  if (authContext === false) {
+    throw new Error('Unauthorized')
+  }
+
   return {
     sessionKey,
+    authContext,
   }
 }
 

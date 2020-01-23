@@ -98,6 +98,7 @@ const UpgradeToWebRTC = ({
   })
 
   const nextConnection = Connection({
+    authContext: currentConnection.authContext,
     send: (data) => {
       txDebug(data)
       sendInChunks(data)

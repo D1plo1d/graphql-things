@@ -55,6 +55,7 @@ const EncryptedConnection = ({
   const {
     sessionKey,
     meta: receivedMeta,
+    authContext,
   } = await handshake({
     currentConnection,
     protocol,
@@ -73,6 +74,7 @@ const EncryptedConnection = ({
 
   const nextConnection = Connection({
     sessionID,
+    authContext,
     send: async (data) => {
       lastTXMessageID += 1
 

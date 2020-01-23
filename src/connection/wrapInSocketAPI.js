@@ -91,6 +91,8 @@ const wrapInSocketAPI = (params) => {
   }
 
   const onConnection = (nextConnection) => {
+    socket.authContext = nextConnection.authContext
+
     if (shouldAbortConnection()) {
       nextConnection.close()
       socket.close()
