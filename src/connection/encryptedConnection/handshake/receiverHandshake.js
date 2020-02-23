@@ -76,10 +76,6 @@ const receiverHandshake = async ({
     authToken,
   })
 
-  if (authContext === false) {
-    throw new Error('Unauthorized')
-  }
-
   return {
     sessionKey,
     authContext,

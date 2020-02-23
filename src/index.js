@@ -11,6 +11,7 @@ import {
 
 import { CONNECTION_TIMEOUT } from './connection/ConnectionTimeout'
 import connect from './connection/connect'
+import UnauthorizedAccess from './connection/errors/UnauthorizedAccess'
 
 /*
  * Client
@@ -29,6 +30,7 @@ export {
   getInviteCode,
   parseInviteCode,
   connect,
+  UnauthorizedAccess,
   ThingLink,
   GraphQLThing,
   CONNECTION_TIMEOUT,

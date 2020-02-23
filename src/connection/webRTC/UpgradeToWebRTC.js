@@ -129,4 +129,17 @@ const UpgradeToWebRTC = ({
   return nextConnection
 }
 
-export default UpgradeToWebRTC
+const AbortableUpgradeToWebRTC = args1 => (args2) => {
+  const { currentConnection } = args2
+
+  return Promise.race([
+    UpgradeToWebRTC(args1)(args2),
+    new Promise((_, reject) => {
+      currentConnection.on('error', (e) => {
+        reject(e)
+      })
+    }),
+  ])
+}
+
+export default AbortableUpgradeToWebRTC

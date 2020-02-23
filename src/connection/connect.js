@@ -100,7 +100,9 @@ const connect = async (options) => {
     })
   )
 
-  return connectionPath.reduce(connectionReducer, Promise.resolve(null))
+  const nextConnection = await connectionPath.reduce(connectionReducer, Promise.resolve(null))
+
+  return nextConnection
 }
 
 export default connect

@@ -8,6 +8,10 @@ import encryptedDataMessage from '../../messages/encryptedDataMessage'
 import initiatorHandshake from './handshake/initiatorHandshake'
 import receiverHandshake from './handshake/receiverHandshake'
 
+import { UNAUTHORIZED } from '../../constants'
+import UnauthorizedAccess from '../errors/UnauthorizedAccess'
+import unauthorizedMessage from '../../messages/unauthorizedMessage'
+
 const rxDebug = Debug('graphql-things:encrypted:rx')
 const txDebug = Debug('graphql-things:encrypted:tx')
 
@@ -65,7 +69,7 @@ const EncryptedConnection = ({
     request,
     meta,
     authToken,
-    authenticate, 
+    authenticate,
   })
 
   if (initiator) {
@@ -118,7 +122,14 @@ const EncryptedConnection = ({
       rxDebug(data)
 
       receivedMessageIDs[data.id] = true
-      nextConnection.emit('data', data)
+
+      if (data.type === UNAUTHORIZED) {
+        rxDebug('UNAUTHORIZED ACCESS')
+        currentConnection.emit('error', new UnauthorizedAccess())
+        currentConnection.close()
+      } else {
+        nextConnection.emit('data', data)
+      }
     }
   }
 
@@ -136,6 +147,13 @@ const EncryptedConnection = ({
     // clean up
     setTimeout(() => nextConnection.removeAllListeners(), 0)
   })
+
+  if (!initiator && authContext === false) {
+    await nextConnection.send(unauthorizedMessage())
+    nextConnection.close()
+
+    throw new UnauthorizedAccess()
+  }
 
   return nextConnection
 }

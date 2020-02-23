@@ -21,11 +21,13 @@ export const PUBLIC_KEY_LENGTH = 32
 export const HANDSHAKE_REQ = 'HANDSHAKE_REQ'
 export const HANDSHAKE_RES = 'HANDSHAKE_RES'
 export const SIGNAL = 'SIGNAL'
+export const UNAUTHORIZED = 'UNAUTHORIZED'
 export const DATA = 'DATA'
 
 export const MESSAGE_TYPES = [
   HANDSHAKE_REQ,
   HANDSHAKE_RES,
   SIGNAL,
+  UNAUTHORIZED,
   DATA,
 ]
