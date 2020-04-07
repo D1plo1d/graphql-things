@@ -5,14 +5,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start:client": "parcel ./src/index.html",
+    "start:client": "yarn parcel ./src/index.html",
     "start:host": "node -r esm ./src/host.js"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
     "caniuse-lite": "^1.0.30000974",
     "esm": "^3.2.25",
-    "parcel-bundler": "^1.12.3"
+    "parcel": "^2.0.0-alpha.3.2"
   },
   "dependencies": {
     "@beaker/dat-node": "RangerMauve/dat-node#168b57c",

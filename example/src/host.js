@@ -58,6 +58,7 @@ const thing = GraphQLThing({
     schemaName: 'books',
     schemaVersion: '1.0',
   },
+  // iceServers: [],
 })
 
 const options = {

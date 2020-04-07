@@ -30,6 +30,7 @@ npm-debug.log
 yarn-error.log
 
 .cache
+.parcel-cache
 
 # BUCK
 buck-out/

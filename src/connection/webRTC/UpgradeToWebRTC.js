@@ -17,14 +17,17 @@ const txDebug = Debug('graphql-things:webrtc:tx')
 const UpgradeToWebRTC = ({
   wrtc,
   initiator,
+  iceServers,
 } = {}) => async ({
   currentConnection,
   protocol,
   timeoutAt,
 }) => {
+  debug({ iceServers })
   const rtcPeer = new Peer({
     initiator,
     wrtc,
+    config: { iceServers },
     trickle: false,
   })
 

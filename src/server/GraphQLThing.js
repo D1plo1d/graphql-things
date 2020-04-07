@@ -22,6 +22,7 @@ const GraphqlThing = ({
   recycleSessionIDsAfter = 20000,
   wrtc,
   meta,
+  iceServers,
 }) => {
   if (typeof authenticate !== 'function') {
     throw new Error('an authenticate callback is required')
@@ -90,6 +91,7 @@ const GraphqlThing = ({
       wrtc,
       meta,
       authenticate,
+      iceServers
     })
     const socket = createSocket(null, message.protocol)
 

@@ -38,6 +38,7 @@ const connect = async (options) => {
     onMeta,
     authToken,
     authenticate,
+    iceServers,
   } = options
 
   let {
@@ -73,6 +74,7 @@ const connect = async (options) => {
     onMeta,
     authToken,
     authenticate,
+    iceServers,
   })
 
   const connectionReducer = (currentConnectionPromise, nextConnectionFn) => (

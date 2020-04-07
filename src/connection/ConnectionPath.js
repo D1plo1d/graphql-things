@@ -16,6 +16,7 @@ const ConnectionPath = ({
   onMeta,
   authToken,
   authenticate,
+  iceServers,
 }) => {
   if (initiator == null) {
     throw new Error('initiator cannot be null. Must be either true or false')
@@ -44,6 +45,7 @@ const ConnectionPath = ({
     UpgradeToWebRTC({
       initiator,
       wrtc,
+      iceServers,
     }),
   ]
   return connectionPath

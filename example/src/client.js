@@ -8,7 +8,8 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 
 import QRReader from 'react-qr-reader'
 
-import { ThingLink, parseInviteCode, connect } from 'graphql-things/client'
+// import { ThingLink, parseInviteCode, connect } from 'graphql-things/client'
+import { ThingLink, parseInviteCode, connect } from '../../dist/'
 
 const createClient = (inviteCode) => {
   let invite
@@ -26,6 +27,7 @@ const createClient = (inviteCode) => {
       // eslint-disable-next-line no-console
       onMeta: meta => console.log('Received meta data from peer', meta),
       authToken: 'YOUR_JWT_OR_OPAQUE_TOKEN_HERE',
+      // iceServers: [],
     }),
   })
 
