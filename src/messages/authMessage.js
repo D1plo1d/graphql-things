@@ -4,8 +4,8 @@ export const validateAuthMessage = (handshakeReq) => {
   const {
     type,
     authToken,
+    iceServers
   } = handshakeReq
-
   if (type !== AUTH) {
     throw new Error('type must be AUTH')
   }
@@ -20,9 +20,11 @@ export const validateAuthMessage = (handshakeReq) => {
  */
 const authMessage = ({
   authToken,
+  iceServers,
 }) => ({
   type: AUTH,
   authToken,
+  iceServers,
 })
 
 export default authMessage

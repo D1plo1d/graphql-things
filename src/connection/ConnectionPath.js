@@ -40,12 +40,12 @@ const ConnectionPath = ({
       onMeta,
       authToken,
       authenticate,
+      initiatorIceServers: iceServers,
     }),
     // Exchange SDPs over the secure connection and switch to WebRTC
     UpgradeToWebRTC({
       initiator,
       wrtc,
-      iceServers,
     }),
   ]
   return connectionPath

@@ -17,12 +17,13 @@ const txDebug = Debug('graphql-things:webrtc:tx')
 const UpgradeToWebRTC = ({
   wrtc,
   initiator,
-  iceServers,
 } = {}) => async ({
   currentConnection,
   protocol,
   timeoutAt,
 }) => {
+  const { iceServers } = currentConnection
+
   debug({ iceServers })
   const rtcPeer = new Peer({
     initiator,
@@ -110,6 +111,7 @@ const UpgradeToWebRTC = ({
   })
 
   const onError = (error) => {
+    debug('error', e)
     nextConnection.emit('error', error)
   }
 

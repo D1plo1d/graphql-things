@@ -12,6 +12,7 @@ import { UNAUTHORIZED } from '../../constants'
 import UnauthorizedAccess from '../errors/UnauthorizedAccess'
 import unauthorizedMessage from '../../messages/unauthorizedMessage'
 
+const debug = Debug('graphql-things:encrypted')
 const rxDebug = Debug('graphql-things:encrypted:rx')
 const txDebug = Debug('graphql-things:encrypted:tx')
 
@@ -25,6 +26,7 @@ const EncryptedConnection = ({
   onMeta,
   authToken,
   authenticate,
+  initiatorIceServers,
 }) => async ({
   protocol,
   sessionID,
@@ -60,6 +62,7 @@ const EncryptedConnection = ({
     sessionKey,
     meta: receivedMeta,
     authContext,
+    iceServers: receivedIceServers,
   } = await handshake({
     currentConnection,
     protocol,
@@ -70,15 +73,21 @@ const EncryptedConnection = ({
     meta,
     authToken,
     authenticate,
+    iceServers: initiatorIceServers,
   })
 
   if (initiator) {
     onMeta(receivedMeta)
   }
 
+  const iceServers = initiator ? initiatorIceServers : receivedIceServers
+
+  debug({ iceServers })
+
   const nextConnection = Connection({
     sessionID,
     authContext,
+    iceServers,
     send: async (data) => {
       lastTXMessageID += 1
 

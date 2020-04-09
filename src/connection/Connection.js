@@ -6,6 +6,7 @@ import EventEmitter from 'eventemitter3'
 const Connection = ({
   sessionID,
   authContext,
+  iceServers,
   send,
   close,
 }) => {
@@ -14,6 +15,7 @@ const Connection = ({
   Object.assign(connection, {
     sessionID,
     authContext,
+    iceServers,
     send,
     close,
   })

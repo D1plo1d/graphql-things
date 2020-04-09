@@ -1,3 +1,5 @@
+import Debug from 'debug'
+
 import { createECDHKey, createSessionKey } from '../../../p2pCrypto/keys'
 import { encrypt, decrypt } from '../../../p2pCrypto/encryption'
 
@@ -8,6 +10,8 @@ import { validateHandshakeRes } from '../../../messages/handshakeResMessage'
 import authMessage from '../../../messages/authMessage'
 import encryptedDataMessage from '../../../messages/encryptedDataMessage'
 
+const debug = Debug('graphql-things:initiator:handshake:tx')
+
 const initiatorHandshake = async ({
   currentConnection,
   protocol,
@@ -15,6 +19,7 @@ const initiatorHandshake = async ({
   identityKeys,
   peerIdentityPublicKey,
   authToken,
+  iceServers,
 }) => {
   const ephemeralKeys = await createECDHKey()
 
@@ -67,7 +72,14 @@ const initiatorHandshake = async ({
   /*
    * send the authToken
    */
-  const encryptedData = await encrypt(authMessage({ authToken }), { sessionKey })
+
+  const authPayload = authMessage({ authToken, iceServers })
+  debug(authPayload)
+
+  const encryptedData = await encrypt(
+    authPayload,
+    { sessionKey },
+  )
 
   currentConnection.send(
     encryptedDataMessage({

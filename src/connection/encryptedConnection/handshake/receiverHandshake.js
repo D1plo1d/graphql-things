@@ -1,3 +1,5 @@
+import Debug from 'debug'
+
 import { createECDHKey, createSessionKey } from '../../../p2pCrypto/keys'
 import { encrypt, decrypt } from '../../../p2pCrypto/encryption'
 import eventTrigger from '../../../eventTrigger'
@@ -5,6 +7,8 @@ import eventTrigger from '../../../eventTrigger'
 import handshakeResMessage from '../../../messages/handshakeResMessage'
 import { validateHandshakeReq } from '../../../messages/handshakeReqMessage'
 import { validateAuthMessage } from '../../../messages/authMessage'
+
+const debug = Debug('graphql-things:receiver:handshake:rx')
 
 const receiverHandshake = async ({
   currentConnection,
@@ -68,17 +72,20 @@ const receiverHandshake = async ({
     },
   })
 
+  debug(auth)
   validateAuthMessage(auth)
-  const { authToken } = auth
+  const { authToken, iceServers } = auth
 
   const authContext = await authenticate({
     peerIdentityPublicKey,
     authToken,
+    iceServers,
   })
 
   return {
     sessionKey,
     authContext,
+    iceServers,
   }
 }
 
