@@ -1,6 +1,6 @@
 {
   "name": "graphql-things",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "P2P GraphQL for the Internet of Things",
   "main": "dist/index.js",
   "repository": "https://github.com/d1plo1d/graphql-things",
