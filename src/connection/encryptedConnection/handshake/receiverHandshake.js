@@ -17,7 +17,6 @@ const receiverHandshake = async ({
   identityKeys,
   peerIdentityPublicKey,
   request,
-  meta,
   authenticate,
 }) => {
   /*
@@ -35,7 +34,7 @@ const receiverHandshake = async ({
     peerEphemeralPublicKey: request.ephemeralPublicKey,
   })
 
-  const encryptedData = await encrypt({ meta }, { sessionKey })
+  const encryptedData = await encrypt({}, { sessionKey })
 
 
   /*

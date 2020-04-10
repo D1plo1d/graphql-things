@@ -36,8 +36,6 @@ const ConnectionPath = ({
       identityKeys,
       peerIdentityPublicKey,
       request,
-      meta,
-      onMeta,
       authToken,
       authenticate,
       initiatorIceServers: iceServers,
@@ -46,6 +44,8 @@ const ConnectionPath = ({
     UpgradeToWebRTC({
       initiator,
       wrtc,
+      meta,
+      onMeta,
     }),
   ]
   return connectionPath

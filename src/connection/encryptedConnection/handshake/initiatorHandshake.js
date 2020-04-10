@@ -41,7 +41,6 @@ const initiatorHandshake = async ({
    */
   const {
     sessionKey,
-    meta,
   } = await eventTrigger(currentConnection, 'data', {
     filter: result => result != null,
     map: async (response) => {
@@ -58,7 +57,7 @@ const initiatorHandshake = async ({
 
         const data = await decrypt(response.encryptedData, { sessionKey: key })
 
-        return { sessionKey: key, meta: data.meta }
+        return { sessionKey: key }
       } catch (e) {
         /*
          * invalid messages may be caused by MITM attacks with invalid data so
@@ -90,7 +89,6 @@ const initiatorHandshake = async ({
   )
 
   return {
-    meta,
     sessionKey,
   }
 }

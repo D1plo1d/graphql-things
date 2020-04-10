@@ -17,6 +17,8 @@ const txDebug = Debug('graphql-things:webrtc:tx')
 const UpgradeToWebRTC = ({
   wrtc,
   initiator,
+  meta,
+  onMeta,
 } = {}) => async ({
   currentConnection,
   protocol,
@@ -41,13 +43,21 @@ const UpgradeToWebRTC = ({
 
   const sendSignalToPeer = (sdp) => {
     currentConnection.send(webRTCUpgradeMessage({
-      protocol,
+      // protocol,
       sdp,
+      meta,
     }))
   }
 
+  let metaReceived = false
+
   const receiveSignalFromPeer = (message) => {
     if (isValidSignal(message)) {
+      if (initiator && metaReceived === false) {
+        metaReceived = true
+        onMeta(message.meta)
+      }
+
       rtcPeer.signal(message.sdp)
     }
   }

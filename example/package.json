@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start:client": "yarn parcel ./src/index.html",
+    "start:client": "yarn parcel ./src/index.html --no-cache",
     "start:host": "node -r esm ./src/host.js"
   },
   "devDependencies": {

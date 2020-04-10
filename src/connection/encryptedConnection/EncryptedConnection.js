@@ -22,8 +22,6 @@ const EncryptedConnection = ({
   peerIdentityPublicKey: peerIdentityPublicKeyParam,
   // the connection request message if initiator = false
   request,
-  meta,
-  onMeta,
   authToken,
   authenticate,
   initiatorIceServers,
@@ -60,7 +58,6 @@ const EncryptedConnection = ({
 
   const {
     sessionKey,
-    meta: receivedMeta,
     authContext,
     iceServers: receivedIceServers,
   } = await handshake({
@@ -70,15 +67,10 @@ const EncryptedConnection = ({
     identityKeys,
     peerIdentityPublicKey,
     request,
-    meta,
     authToken,
     authenticate,
     iceServers: initiatorIceServers,
   })
-
-  if (initiator) {
-    onMeta(receivedMeta)
-  }
 
   const iceServers = initiator ? initiatorIceServers : receivedIceServers
 
