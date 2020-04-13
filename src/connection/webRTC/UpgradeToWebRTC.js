@@ -121,7 +121,7 @@ const UpgradeToWebRTC = ({
   })
 
   const onError = (error) => {
-    debug('error', e)
+    debug('error', error)
     nextConnection.emit('error', error)
   }
 
