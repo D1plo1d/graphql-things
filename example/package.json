@@ -17,7 +17,7 @@
     "@beaker/dat-node": "RangerMauve/dat-node#168b57c",
     "apollo-cache-inmemory": "^1.6.2",
     "apollo-client": "^2.5",
-    "apollo-server": "^2.6.9",
+    "apollo-server": "^2.14.2",
     "bluebird": "^3.5.5",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.1",
