@@ -1,8 +1,12 @@
 ## GraphQL Things
 
-A decentralized, encrypted Apollo Link for the internet of things compatible with [Beaker Browser](https://beakerbrowser.com).
+A <!-- decentralized, encrypted --> Apollo Link for the internet of things <!-- compatible with [Beaker Browser](https://beakerbrowser.com) -->.
 
-#### The problems with cloud-based IOT Apps
+**Note:** GraphQL Things is undergowing major changes and should not be considered ready for general use.
+
+See the example folder for working demo.
+
+<!-- #### The problems with cloud-based IOT Apps
 
 1. You can't connect to your device if there is no internet.
 2. you don't own your data.
@@ -25,21 +29,21 @@ With GraphQL Things you, the consumer maintain complete ownership of your data s
     width="500"
   />
 </p>
+!-->
 
-## Features
-* **Decentralized** - GraphQL Things require no centralized servers, no DNS and no Certificate Authorities. Users discover and connect to their GraphQL Things through the P2P network with or without the internet.
-* **End-to-end Encrypted** - GraphQL Things use [Triple Diffie Helman](https://signal.org/docs/specifications/x3dh/) and 256-bit [Eliptical Curve Cryptography](https://www.globalsign.com/en/blog/elliptic-curve-cryptography/) to establish authenticated end-to-end encrypted connections.
-* **Secure Onboarding** - "Invite" QR Codes containing cryptographic key data allow users to to establish initial trust even when their internet is down.
-* **Data Ownership** - you, the consumer maintain complete ownership of your data since it is never stored on a cloud server and all communication to your device is end-to-end encrypted.
+<!-- ## Features -->
+<!-- * **Decentralized** - GraphQL Things require no centralized servers, no DNS and no Certificate Authorities. Users discover and connect to their GraphQL Things through the P2P network with or without the internet. -->
+<!-- * **End-to-end Encrypted** - GraphQL Things use [Triple Diffie Helman](https://signal.org/docs/specifications/x3dh/) and 256-bit [Eliptical Curve Cryptography](https://www.globalsign.com/en/blog/elliptic-curve-cryptography/) to establish authenticated end-to-end encrypted connections. -->
+<!-- * **Secure Onboarding** - "Invite" QR Codes containing cryptographic key data allow users to to establish initial trust even when their internet is down.
+* **Data Ownership** - you, the consumer maintain complete ownership of your data since it is never stored on a cloud server and all communication to your device is end-to-end encrypted. -->
 <!-- * **NAT-traversing** - GraphQL Things use [WebRTC and ICE](https://www.youtube.com/watch?v=7qAQuC9muf8) to establish connections directly from the device to any authorized client. -->
-* **Beaker Browser Ready** - GraphQL Things are built on the [Dat P2P protocol](https://datproject.org/) so any GraphQL Thing can be queried directly from the Dat-based [Beaker Browser](https://beakerbrowser.com/).
-
+<!-- * **Beaker Browser Ready** - GraphQL Things are built on the [Dat P2P protocol](https://datproject.org/) so any GraphQL Thing can be queried directly from the Dat-based [Beaker Browser](https://beakerbrowser.com/). -->
 
 ## Security Disclaimer
 
 GraphQL Things' cryptography has not been security audited and should not be used in production until it has. Use at your own risk.
 
-## Useage
+<!-- ## Useage
 
 ### Apollo Client
 
@@ -160,4 +164,4 @@ createInvite({
     )
   })
 })
-```
+``` -->
