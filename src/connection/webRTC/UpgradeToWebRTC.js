@@ -50,7 +50,11 @@ const UpgradeToWebRTC = ({
   }
 
   let metaReceived = false
+  let maximumMessageSize = 65535
 
+  /*
+   * Receive the signal from the peer and set the max message size based on the SDP
+   */
   const receiveSignalFromPeer = (message) => {
     if (isValidSignal(message)) {
       if (initiator && metaReceived === false) {
@@ -58,6 +62,13 @@ const UpgradeToWebRTC = ({
         onMeta(message.meta)
       }
 
+      // Parse a=max-message-size
+      const match = message.sdp.sdp.match(/a=max-message-size:\s*(\d+)/)
+      if (match !== null && match.length >= 2) {
+        maximumMessageSize = parseInt(match[1], 10)
+      }
+
+      // Set the signal
       rtcPeer.signal(message.sdp)
     }
   }
@@ -73,6 +84,9 @@ const UpgradeToWebRTC = ({
   let timeoutReference
   const timeoutMS = Math.max(timeoutAt - Date.now(), 0)
 
+  /*
+   * Wait for the data channel to open via the connect event
+   */
   await new Promise((resolve, reject) => {
     timeoutReference = setTimeout(() => {
       rtcPeer.removeListener('iceStateChange', onIceChange)
@@ -100,7 +114,7 @@ const UpgradeToWebRTC = ({
   let sendErrored = false
 
   // eslint-disable-next-line no-underscore-dangle
-  const sendInChunks = chunkifier(rtcPeer._channel, (data) => {
+  const sendInChunks = chunkifier({ channel: rtcPeer._channel, maximumMessageSize }, (data) => {
     if (sendErrored) return
 
     try {

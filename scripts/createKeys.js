@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import { createECDHKey } from '../src'
+import { createECDHKey } from '../dist'
 
 const createKeys = async () => {
   const clientKeys = await createECDHKey()

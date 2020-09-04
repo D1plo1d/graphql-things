@@ -35,7 +35,7 @@ const datPeers = dat.getPeers(DAT_URL)
 * return true to allow the connection if an authorized user can be found with
 * the identity public key.
 */
-const authenticate = ({ peerIdentityPublicKey, authToken }) => {
+const authenticate = async ({ peerIdentityPublicKey, authToken }) => {
   // eslint-disable-next-line no-console
   console.log(`\n\nNew connection from ${peerIdentityPublicKey} token: ${authToken}`)
 
@@ -45,7 +45,13 @@ const authenticate = ({ peerIdentityPublicKey, authToken }) => {
    * Replace this return with your authentication logic to prevent unauthorized
    * access.
    */
-  return peerIdentityPublicKey === clientKeys.publicKey
+  if (peerIdentityPublicKey !== clientKeys.publicKey) {
+    return false
+  }
+
+  return {
+    user: 'MyUserObject',
+  }
 }
 
 const thing = GraphQLThing({

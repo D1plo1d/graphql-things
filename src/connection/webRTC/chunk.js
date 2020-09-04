@@ -20,18 +20,20 @@ const PREFIXES = {
 const ID_BYTES = 16
 const HEADER_BYTES = ID_BYTES + 2
 const MAX_ID = (2 ** ID_BYTES) - 1
-const CHUNK_BYTES = 65536
-const CHUNK_PAYLOAD_BYTES = CHUNK_BYTES - HEADER_BYTES
 
-const splitMessageIntoChunks = ({ id, buf }) => {
-  if (buf.length < CHUNK_PAYLOAD_BYTES) {
+const splitMessageIntoChunks = ({
+  maxPayloadSize,
+  id,
+  buf,
+}) => {
+  if (buf.length < maxPayloadSize) {
     // small messages are not chunked
     return [
       msgpack.encode([PREFIXES.SMALL_UNCHUNKED_MESSAGE, id, buf]),
     ]
   }
 
-  const chunks = splitSlice(buf, CHUNK_PAYLOAD_BYTES).map(chunkPayload => (
+  const chunks = splitSlice(buf, maxPayloadSize).map(chunkPayload => (
     msgpack.encode([PREFIXES.CHUNKED_MESSAGE, id, chunkPayload])
   ))
 
@@ -47,7 +49,11 @@ const setImmediate = fn => setTimeout(fn, 0)
 /*
  * for asynchronusly encoding messages into an array of chunks
  */
-export const chunkifier = (channel, callback) => {
+export const chunkifier = (opts, callback) => {
+  const { channel, maximumMessageSize } = opts
+
+  const maxPayloadSize = maximumMessageSize - HEADER_BYTES
+
   let nextID = 0
   let chunks = []
   const bufferedAmountLowThreshold = channel.bufferedAmountLowThreshold || 0
@@ -70,6 +76,7 @@ export const chunkifier = (channel, callback) => {
     const previouslyEmptyChunks = chunks.length === 0
 
     chunks = chunks.concat(splitMessageIntoChunks({
+      maxPayloadSize,
       id: nextID,
       buf,
     }))
