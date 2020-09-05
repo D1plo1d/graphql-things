@@ -1,48 +1,12 @@
 import msgpack from 'msgpack-lite'
+import * as dc from '@saltyrtc/chunked-dc/dist/chunked-dc.es2015'
 
-const splitSlice = (str, len) => {
-  const ret = []
-  for (let offset = 0, strLen = str.length; offset < strLen; offset += len) {
-    ret.push(str.slice(offset, len + offset))
-  }
-  return ret
-}
-
-const PREFIXES = {
-  SMALL_UNCHUNKED_MESSAGE: 'S',
-  HEADER: 'H',
-  CHUNKED_MESSAGE: 'C',
-}
 /*
  * 1 byte for S|H|C, 16 bytes for the message's ID, 1 byte for ':'
  * Note: the message ID is repeated in each chunk for that message
  */
 const ID_BYTES = 16
-const HEADER_BYTES = ID_BYTES + 2
 const MAX_ID = (2 ** ID_BYTES) - 1
-
-const splitMessageIntoChunks = ({
-  maxPayloadSize,
-  id,
-  buf,
-}) => {
-  if (buf.length < maxPayloadSize) {
-    // small messages are not chunked
-    return [
-      msgpack.encode([PREFIXES.SMALL_UNCHUNKED_MESSAGE, id, buf]),
-    ]
-  }
-
-  const chunks = splitSlice(buf, maxPayloadSize).map(chunkPayload => (
-    msgpack.encode([PREFIXES.CHUNKED_MESSAGE, id, chunkPayload])
-  ))
-
-  const header = msgpack.encode([PREFIXES.HEADER, id, chunks.length])
-
-  chunks.unshift(header)
-
-  return chunks
-}
 
 const setImmediate = fn => setTimeout(fn, 0)
 
@@ -52,44 +16,49 @@ const setImmediate = fn => setTimeout(fn, 0)
 export const chunkifier = (opts, callback) => {
   const { channel, maximumMessageSize } = opts
 
-  const maxPayloadSize = maximumMessageSize - HEADER_BYTES
-
   let nextID = 0
-  let chunks = []
-  const bufferedAmountLowThreshold = channel.bufferedAmountLowThreshold || 0
+  const chunks = []
+  // const bufferedAmountLowThreshold = channel.bufferedAmountLowThreshold || 0
+
+  let timeout = null
 
   const sendNextChunks = () => {
+    // console.log({ bufferedAmountLowThreshold, bufferedAmount: channel.bufferedAmount, chunks })
+
+    while (chunks.length > 0 && !chunks[0].hasNext) {
+      chunks.shift()
+    }
+
     if (
       chunks.length > 0
-      && bufferedAmountLowThreshold >= channel.bufferedAmount
+      && chunks[0].hasNext
+      // && bufferedAmountLowThreshold >= channel.bufferedAmount
     ) {
-      callback(chunks.shift())
-      setTimeout(sendNextChunks, 0)
+      const chunk = chunks[0].next().value
+      callback(chunk)
+      timeout = setTimeout(sendNextChunks, 0)
     }
   }
 
-  // eslint-disable-next-line no-param-reassign
-  channel.onbufferedamountlow = sendNextChunks
+  // // eslint-disable-next-line no-param-reassign
+  // channel.onbufferedamountlow = sendNextChunks
 
   return message => setImmediate(() => {
     const buf = msgpack.encode(message)
-    const previouslyEmptyChunks = chunks.length === 0
+    // const previouslyEmptyChunks = chunks.length === 0
 
-    chunks = chunks.concat(splitMessageIntoChunks({
-      maxPayloadSize,
-      id: nextID,
-      buf,
-    }))
+    chunks.push(new dc.UnreliableUnorderedChunker(nextID, buf, maximumMessageSize))
 
     nextID += 1
     if (nextID > MAX_ID) nextID = 0
 
-    if (
-      previouslyEmptyChunks
-      && (channel.bufferedAmount <= bufferedAmountLowThreshold)
-    ) {
-      sendNextChunks()
-    }
+    // if (
+    //   previouslyEmptyChunks
+    //   // && (channel.bufferedAmount <= bufferedAmountLowThreshold)
+    // ) {
+    if (timeout != null) clearTimeout(timeout)
+    sendNextChunks()
+    // }
   })
 }
 
@@ -97,38 +66,14 @@ export const chunkifier = (opts, callback) => {
  * for decoding messages from a series of chunks
  */
 export const dechunkifier = (callback) => {
-  const incommingMessages = {}
+  const unchunker = new dc.UnreliableUnorderedUnchunker()
+
+  unchunker.onMessage = (payload) => {
+    const message = msgpack.decode(payload)
+    callback(message)
+  }
 
   return (data) => {
-    const [prefix, id, payload] = msgpack.decode(data)
-
-    switch (prefix) {
-      case PREFIXES.SMALL_UNCHUNKED_MESSAGE: {
-        const message = msgpack.decode(payload)
-        callback(message)
-        break
-      }
-      case PREFIXES.HEADER: {
-        incommingMessages[id] = {
-          expectedChunksCount: payload,
-          chunks: [],
-        }
-        break
-      }
-      case PREFIXES.CHUNKED_MESSAGE: {
-        const { expectedChunksCount, chunks } = incommingMessages[id]
-
-        chunks.push(payload)
-
-        if (chunks.length >= expectedChunksCount) {
-          const message = msgpack.decode(Buffer.concat(chunks))
-          callback(message)
-        }
-        break
-      }
-      default: {
-        throw new Error(`Invalid prefix: ${prefix}`)
-      }
-    }
+    unchunker.add(data)
   }
 }

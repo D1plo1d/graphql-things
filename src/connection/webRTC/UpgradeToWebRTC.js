@@ -31,6 +31,7 @@ const UpgradeToWebRTC = ({
     initiator,
     wrtc,
     config: { iceServers },
+    // channelConfig: { ordered: false },
     trickle: false,
   })
 

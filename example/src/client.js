@@ -58,12 +58,16 @@ const GET_BOOKS = gql`
     books {
       title
       author
+      text
     }
   }
 `
 
 const App = () => {
+  const [startedAt, setStartedAt] = useState(null)
+  const [finishedAt, setFinishedAt] = useState(null)
   const [client, setClient] = useState(null)
+
   if (client == null) {
     return (
       <div
@@ -80,7 +84,10 @@ const App = () => {
           <h2>GraphQL Thing Login</h2>
           <input
             type="text"
-            onChange={e => setClient(createClient(e.target.value))}
+            onChange={e => {
+              setStartedAt(Date.now())
+              setClient(createClient(e.target.value))
+            }}
             placeholder="Enter your Invite Code"
             style={{ width: '100%' }}
           />
@@ -88,6 +95,7 @@ const App = () => {
         <QRReader
           onScan={(inviteMsg) => {
             if (inviteMsg != null) {
+              setStartedAt(Date.now())
               setClient(createClient(inviteMsg))
             }
           }}
@@ -151,12 +159,25 @@ const App = () => {
                   return <div>{JSON.stringify(error)}</div>
                 }
 
+                const now = finishedAt || new Date()
+                if (finishedAt == null) {
+                  setTimeout(() => setFinishedAt(now), 0)
+                }
+
                 return (
                   <div>
                     <h2>GraphQL Things Example</h2>
+                    <h2>
+                      Downloaded in
+                      {' '}
+                      {((now - startedAt) / 1000).toFixed(1)}
+                      {' '}
+                      seconds
+                    </h2>
                     { data.books.map(book => (
                       <div key={`${book.title} - ${book.author}`}>
-                        {`${book.title} - ${book.author}`}
+                        {`${book.title} - ${book.author} `}
+                        {`(${(book.text.length / 1000).toFixed(0)} KB)`}
                       </div>
                     ))}
                   </div>
