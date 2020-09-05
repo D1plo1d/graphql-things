@@ -1,4 +1,10 @@
 import msgpack from 'msgpack-lite'
+import Debug from 'debug'
+
+const debug = Debug('graphql-things:chunk')
+
+// SaltyRTC Chunking Protocol
+// See https://github.com/saltyrtc/saltyrtc-meta/blob/master/Chunking.md
 
 const splitSlice = (str, len) => {
   const ret = []
@@ -8,40 +14,65 @@ const splitSlice = (str, len) => {
   return ret
 }
 
-const PREFIXES = {
-  SMALL_UNCHUNKED_MESSAGE: 'S',
-  HEADER: 'H',
-  CHUNKED_MESSAGE: 'C',
-}
 /*
  * 1 byte for S|H|C, 16 bytes for the message's ID, 1 byte for ':'
  * Note: the message ID is repeated in each chunk for that message
+ *
+ * TODO: This math is not correct. I've added 10 to the header bytes to
+ * account for msgpack overhead but this is just a guess. It would be
+ * better to stop using msgpack for header encoding
  */
-const ID_BYTES = 16
-const HEADER_BYTES = ID_BYTES + 2
-const MAX_ID = (2 ** ID_BYTES) - 1
+const bitfield = {
+  RELIABLE_ORDERED: 6,
+  UNORDERED_UNRELIABLE: 0,
+  END_OF_MESSAGE: 1,
+}
+
+const headerBytes = {
+  RELIABLE_ORDERED: 1,
+  UNORDERED_UNRELIABLE: 9,
+}
+
+const MAX_ID = (2 ** 32) - 1
+
+const createChunk = ({
+  // id,
+  // serial,
+  payload,
+  endOfMessage = false,
+}) => {
+  let bf = bitfield.RELIABLE_ORDERED
+
+  if (endOfMessage) {
+    // eslint-disable-next-line no-bitwise
+    bf |= bitfield.END_OF_MESSAGE
+  }
+
+  const buf = Buffer.alloc(payload.length + headerBytes.RELIABLE_ORDERED)
+
+  payload.copy(buf, headerBytes.RELIABLE_ORDERED)
+  buf.writeUInt8(bf, 0)
+  // buf.writeUInt32(id, 1)
+  // buf.writeUInt32(serial, 5)
+
+  return buf
+}
 
 const splitMessageIntoChunks = ({
   maxPayloadSize,
   id,
   buf,
 }) => {
-  if (buf.length < maxPayloadSize) {
-    // small messages are not chunked
-    return [
-      msgpack.encode([PREFIXES.SMALL_UNCHUNKED_MESSAGE, id, buf]),
-    ]
-  }
+  const slices = splitSlice(buf, maxPayloadSize)
 
-  const chunks = splitSlice(buf, maxPayloadSize).map(chunkPayload => (
-    msgpack.encode([PREFIXES.CHUNKED_MESSAGE, id, chunkPayload])
+  return slices.map((chunkPayload, i) => (
+    createChunk({
+      id,
+      serial: i,
+      payload: chunkPayload,
+      endOfMessage: i === slices.length - 1,
+    })
   ))
-
-  const header = msgpack.encode([PREFIXES.HEADER, id, chunks.length])
-
-  chunks.unshift(header)
-
-  return chunks
 }
 
 const setImmediate = fn => setTimeout(fn, 0)
@@ -50,29 +81,46 @@ const setImmediate = fn => setTimeout(fn, 0)
  * for asynchronusly encoding messages into an array of chunks
  */
 export const chunkifier = (opts, callback) => {
-  const { channel, maximumMessageSize } = opts
+  const { maximumMessageSize } = opts
 
-  const maxPayloadSize = maximumMessageSize - HEADER_BYTES
+  const maxPayloadSize = maximumMessageSize - headerBytes.RELIABLE_ORDERED
+  // const highWaterMark = 1048576 // 1 MiB
 
-  let nextID = 0
+  let nextID = 1
   let chunks = []
-  const bufferedAmountLowThreshold = channel.bufferedAmountLowThreshold || 0
+  // const bufferedAmountLowThreshold = channel.bufferedAmountLowThreshold || 0
+
+  // Based on https://github.com/webrtc/samples/blob/gh-pages/src/content/datachannel/datatransfer/js/main.js
+  // let timeout
 
   const sendNextChunks = () => {
-    if (
+    // timeout = null
+    // let { bufferedAmount } = channel
+
+    while (
       chunks.length > 0
-      && bufferedAmountLowThreshold >= channel.bufferedAmount
+      // && bufferedAmountLowThreshold >= channel.bufferedAmount
     ) {
-      callback(chunks.shift())
-      setTimeout(sendNextChunks, 0)
+      // if (bufferedAmount < highWaterMark) {
+      const chunk = chunks.shift()
+      callback(chunk)
+      // bufferedAmount += chunk.length
+      // } else {
+      //   timeout = setTimeout(sendNextChunks, 0)
+      //   return
+      // }
     }
   }
 
-  // eslint-disable-next-line no-param-reassign
-  channel.onbufferedamountlow = sendNextChunks
+  // // eslint-disable-next-line no-param-reassign
+  // channel.onbufferedamountlow = sendNextChunks
 
   return message => setImmediate(() => {
+    // console.log('SEND', message)
+    const encodingStartedAt = Date.now()
     const buf = msgpack.encode(message)
+    debug(`Message encoded in ${((Date.now() - encodingStartedAt) / 1000).toFixed(1)} seconds`)
+
     const previouslyEmptyChunks = chunks.length === 0
 
     chunks = chunks.concat(splitMessageIntoChunks({
@@ -82,12 +130,13 @@ export const chunkifier = (opts, callback) => {
     }))
 
     nextID += 1
-    if (nextID > MAX_ID) nextID = 0
+    if (nextID > MAX_ID) nextID = 1
 
     if (
       previouslyEmptyChunks
-      && (channel.bufferedAmount <= bufferedAmountLowThreshold)
+      // && (channel.bufferedAmount <= bufferedAmountLowThreshold)
     ) {
+      // if (timeout != null) clearTimeout(timeout)
       sendNextChunks()
     }
   })
@@ -100,35 +149,49 @@ export const dechunkifier = (callback) => {
   const incommingMessages = {}
 
   return (data) => {
-    const [prefix, id, payload] = msgpack.decode(data)
+    const bf = data.readUInt8(0)
 
-    switch (prefix) {
-      case PREFIXES.SMALL_UNCHUNKED_MESSAGE: {
-        const message = msgpack.decode(payload)
-        callback(message)
-        break
-      }
-      case PREFIXES.HEADER: {
-        incommingMessages[id] = {
-          expectedChunksCount: payload,
-          chunks: [],
-        }
-        break
-      }
-      case PREFIXES.CHUNKED_MESSAGE: {
-        const { expectedChunksCount, chunks } = incommingMessages[id]
+    // eslint-disable-next-line no-bitwise
+    const endOfMessage = bf & bitfield.END_OF_MESSAGE
 
-        chunks.push(payload)
+    let id
+    let payload
+    // let serial
 
-        if (chunks.length >= expectedChunksCount) {
-          const message = msgpack.decode(Buffer.concat(chunks))
-          callback(message)
-        }
-        break
+    // eslint-disable-next-line no-bitwise
+    if (bf & bitfield.RELIABLE_ORDERED) {
+      id = 0 // IDs zero is not used for RELIABLE_ORDERED messages
+      payload = data.slice(headerBytes.RELIABLE_ORDERED)
+    // eslint-disable-next-line no-bitwise
+    } else if (bf & bitfield.UNORDERED_UNRELIABLE) {
+      // id = data.readUInt32(1)
+      // payload = data.slice(9)
+      // const serial = data.readUInt32(5)
+      throw new Error('Unreliable unorder not yet implemented')
+    } else {
+      throw new Error(`Invalid bitfield value ${bf}`)
+    }
+
+    if (incommingMessages[id] == null) {
+      incommingMessages[id] = {
+        expectedChunksCount: null,
+        chunks: [],
       }
-      default: {
-        throw new Error(`Invalid prefix: ${prefix}`)
-      }
+    }
+
+    const { chunks } = incommingMessages[id]
+
+    chunks.push(payload)
+
+    if (endOfMessage) {
+      const decodingStartedAt = Date.now()
+      const message = msgpack.decode(Buffer.concat(chunks))
+      debug(`Message decoded in ${((Date.now() - decodingStartedAt) / 1000).toFixed(1)} seconds`)
+
+      delete incommingMessages[id]
+
+      // console.log('RECEIVE', message)
+      callback(message)
     }
   }
 }

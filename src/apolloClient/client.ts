@@ -659,6 +659,7 @@ export class Client {
         break;
 
       default:
+        console.error({ message })
         throw new Error('Invalid message type!');
     }
   }

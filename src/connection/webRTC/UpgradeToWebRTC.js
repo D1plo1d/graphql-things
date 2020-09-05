@@ -62,11 +62,11 @@ const UpgradeToWebRTC = ({
         onMeta(message.meta)
       }
 
-      // Parse a=max-message-size
-      const match = message.sdp.sdp.match(/a=max-message-size:\s*(\d+)/)
-      if (match !== null && match.length >= 2) {
-        maximumMessageSize = parseInt(match[1], 10)
-      }
+      // // Parse a=max-message-size
+      // const match = message.sdp.sdp.match(/a=max-message-size:\s*(\d+)/)
+      // if (match !== null && match.length >= 2) {
+      //   maximumMessageSize = parseInt(match[1], 10)
+      // }
 
       // Set the signal
       rtcPeer.signal(message.sdp)
@@ -118,7 +118,7 @@ const UpgradeToWebRTC = ({
     if (sendErrored) return
 
     try {
-      rtcPeer.send(data)
+      rtcPeer.write(data)
     } catch (e) {
       sendErrored = true
       rtcPeer.destroy(e)
