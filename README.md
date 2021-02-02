@@ -1,5 +1,7 @@
 ## GraphQL Things
 
+** This library has been deprecated by the author and is no longer maintained. Use at your own risk. **
+
 A <!-- decentralized, encrypted --> Apollo Link for the internet of things <!-- compatible with [Beaker Browser](https://beakerbrowser.com) -->.
 
 **Note:** GraphQL Things is undergowing major changes and should not be considered ready for general use.
